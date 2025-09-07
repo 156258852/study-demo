@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>自定义 Radio 和 Checkbox 样式</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        h1 {
+            text-align: center;
+        }
+
+        .section {
+            margin: 30px 0;
+            padding: 20px;
+            border: 1px solid #eee;
+            border-radius: 5px;
+        }
+
+        h2 {
+            color: #333;
+            margin-top: 0;
+        }
+
+        /* 隐藏原始的 radio 和 checkbox */
+        input[type="radio"], 
+        input[type="checkbox"] {
+            opacity: 0;
+            position: absolute;
+            width: 0;
+            height: 0;
+        }
+
+        /* 自定义 radio 样式 */
+        .radio-group {
+            margin: 15px 0;
+        }
+
+        .radio-item {
+            display: flex;
+            align-items: center;
+            margin: 10px 0;
+        }
+
+        .radio-item label {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .custom-radio {
+            width: 20px;
+            height: 20px;
+            border: 2px solid #ccc;
+            border-radius: 50%;
+            margin-right: 10px;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .custom-radio::after {
+            content: "";
+            width: 12px;
+            height: 12px;
+            background-color: #007bff;
+            border-radius: 50%;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            transition: transform 0.3s ease;
+        }
+
+        input[type="radio"]:checked + label .custom-radio {
+            border-color: #007bff;
+        }
+
+        input[type="radio"]:checked + label .custom-radio::after {
+            transform: translate(-50%, -50%) scale(1);
+        }
+
+        input[type="radio"]:focus + label .custom-radio {
+            box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
+        }
+
+        /* 自定义 checkbox 样式 */
+        .checkbox-group {
+            margin: 15px 0;
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            margin: 10px 0;
+        }
+
+        .checkbox-item label {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .custom-checkbox {
+            width: 20px;
+            height: 20px;
+            border: 2px solid #ccc;
+            margin-right: 10px;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .custom-checkbox::after {
+            content: "";
+            position: absolute;
+            top: 2px;
+            left: 6px;
+            width: 5px;
+            height: 10px;
+            border: solid white;
+            border-width: 0 2px 2px 0;
+            transform: rotate(45deg) scale(0);
+            transition: transform 0.3s ease;
+        }
+
+        input[type="checkbox"]:checked + label .custom-checkbox {
+            background-color: #007bff;
+            border-color: #007bff;
+        }
+
+        input[type="checkbox"]:checked + label .custom-checkbox::after {
+            transform: rotate(45deg) scale(1);
+        }
+
+        input[type="checkbox"]:focus + label .custom-checkbox {
+            box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
+        }
+
+        /* 不同样式变体 */
+        .variant-group {
+            margin: 15px 0;
+        }
+
+        .variant-title {
+            font-weight: bold;
+            margin: 10px 0 5px;
+        }
+
+        /* 圆角 checkbox */
+        .rounded-checkbox .custom-checkbox {
+            border-radius: 5px;
+        }
+
+        .rounded-checkbox input[type="checkbox"]:checked + label .custom-checkbox::after {
+            border-color: white;
+            border-width: 0 2px 2px 0;
+            width: 6px;
+            height: 12px;
+            left: 5px;
+        }
+
+        /* 方形 radio */
+        .square-radio .custom-radio {
+            border-radius: 0;
+        }
+
+        .square-radio .custom-radio::after {
+            border-radius: 0;
+            width: 12px;
+            height: 12px;
+        }
+
+        /* 大尺寸变体 */
+        .large .custom-radio,
+        .large .custom-checkbox {
+            width: 25px;
+            height: 25px;
+        }
+
+        .large .custom-radio::after {
+            width: 15px;
+            height: 15px;
+        }
+
+        .large .custom-checkbox::after {
+            top: 3px;
+            left: 7px;
+            width: 6px;
+            height: 12px;
+        }
+
+        /* 不同颜色变体 */
+        /* 绿色 */
+        .green input[type="radio"]:checked + label .custom-radio,
+        .green input[type="radio"]:checked + label .custom-radio::after,
+        .green input[type="checkbox"]:checked + label .custom-checkbox {
+            background-color: #28a745;
+            border-color: #28a745;
+        }
+
+        /* 红色 */
+        .red input[type="radio"]:checked + label .custom-radio,
+        .red input[type="radio"]:checked + label .custom-radio::after,
+        .red input[type="checkbox"]:checked + label .custom-checkbox {
+            background-color: #dc3545;
+            border-color: #dc3545;
+        }
+
+        /* 紫色 */
+        .purple input[type="radio"]:checked + label .custom-radio,
+        .purple input[type="radio"]:checked + label .custom-radio::after,
+        .purple input[type="checkbox"]:checked + label .custom-checkbox {
+            background-color: #6f42c1;
+            border-color: #6f42c1;
+        }
+
+        /* 橙色 */
+        .orange input[type="radio"]:checked + label .custom-radio,
+        .orange input[type="radio"]:checked + label .custom-radio::after,
+        .orange input[type="checkbox"]:checked + label .custom-checkbox {
+            background-color: #fd7e14;
+            border-color: #fd7e14;
+        }
+
+        .example-label {
+            margin-left: 5px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <h1>自定义 Radio 和 Checkbox 样式 Demo</h1>
+    
+    <div class="section">
+        <h2>基础 Radio 按钮</h2>
+        <div class="radio-group">
+            <div class="radio-item">
+                <input type="radio" id="radio1" name="radio-group" checked>
+                <label for="radio1">
+                    <span class="custom-radio"></span>
+                    选项 1
+                </label>
+            </div>
+            <div class="radio-item">
+                <input type="radio" id="radio2" name="radio-group">
+                <label for="radio2">
+                    <span class="custom-radio"></span>
+                    选项 2
+                </label>
+            </div>
+            <div class="radio-item">
+                <input type="radio" id="radio3" name="radio-group">
+                <label for="radio3">
+                    <span class="custom-radio"></span>
+                    选项 3
+                </label>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>基础 Checkbox</h2>
+        <div class="checkbox-group">
+            <div class="checkbox-item">
+                <input type="checkbox" id="checkbox1">
+                <label for="checkbox1">
+                    <span class="custom-checkbox"></span>
+                    选项 1
+                </label>
+            </div>
+            <div class="checkbox-item">
+                <input type="checkbox" id="checkbox2" checked>
+                <label for="checkbox2">
+                    <span class="custom-checkbox"></span>
+                    选项 2 (默认选中)
+                </label>
+            </div>
+            <div class="checkbox-item">
+                <input type="checkbox" id="checkbox3">
+                <label for="checkbox3">
+                    <span class="custom-checkbox"></span>
+                    选项 3
+                </label>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>不同样式变体</h2>
+        
+        <div class="variant-group">
+            <div class="variant-title">圆角 Checkbox</div>
+            <div class="checkbox-item rounded-checkbox">
+                <input type="checkbox" id="rounded1">
+                <label for="rounded1">
+                    <span class="custom-checkbox"></span>
+                    圆角样式
+                </label>
+            </div>
+        </div>
+        
+        <div class="variant-group">
+            <div class="variant-title">方形 Radio</div>
+            <div class="radio-item square-radio">
+                <input type="radio" id="square1" name="square-group">
+                <label for="square1">
+                    <span class="custom-radio"></span>
+                    方形样式
+                </label>
+            </div>
+        </div>
+        
+        <div class="variant-group">
+            <div class="variant-title">大尺寸控件</div>
+            <div class="radio-item large">
+                <input type="radio" id="large1" name="large-group">
+                <label for="large1">
+                    <span class="custom-radio"></span>
+                    大号 Radio
+                </label>
+                <span class="example-label">(25px x 25px)</span>
+            </div>
+            <div class="checkbox-item large">
+                <input type="checkbox" id="large2">
+                <label for="large2">
+                    <span class="custom-checkbox"></span>
+                    大号 Checkbox
+                </label>
+                <span class="example-label">(25px x 25px)</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>不同颜色变体</h2>
+        
+        <div class="variant-group">
+            <div class="variant-title">绿色 (Green)</div>
+            <div class="radio-item green">
+                <input type="radio" id="green-radio" name="color-group">
+                <label for="green-radio">
+                    <span class="custom-radio"></span>
+                    绿色 Radio
+                </label>
+            </div>
+            <div class="checkbox-item green">
+                <input type="checkbox" id="green-checkbox">
+                <label for="green-checkbox">
+                    <span class="custom-checkbox"></span>
+                    绿色 Checkbox
+                </label>
+            </div>
+        </div>
+        
+        <div class="variant-group">
+            <div class="variant-title">红色 (Red)</div>
+            <div class="radio-item red">
+                <input type="radio" id="red-radio" name="color-group">
+                <label for="red-radio">
+                    <span class="custom-radio"></span>
+                    红色 Radio
+                </label>
+            </div>
+            <div class="checkbox-item red">
+                <input type="checkbox" id="red-checkbox">
+                <label for="red-checkbox">
+                    <span class="custom-checkbox"></span>
+                    红色 Checkbox
+                </label>
+            </div>
+        </div>
+        
+        <div class="variant-group">
+            <div class="variant-title">紫色 (Purple)</div>
+            <div class="radio-item purple">
+                <input type="radio" id="purple-radio" name="color-group" checked>
+                <label for="purple-radio">
+                    <span class="custom-radio"></span>
+                    紫色 Radio
+                </label>
+            </div>
+            <div class="checkbox-item purple">
+                <input type="checkbox" id="purple-checkbox">
+                <label for="purple-checkbox">
+                    <span class="custom-checkbox"></span>
+                    紫色 Checkbox
+                </label>
+            </div>
+        </div>
+        
+        <div class="variant-group">
+            <div class="variant-title">橙色 (Orange)</div>
+            <div class="radio-item orange">
+                <input type="radio" id="orange-radio" name="color-group">
+                <label for="orange-radio">
+                    <span class="custom-radio"></span>
+                    橙色 Radio
+                </label>
+            </div>
+            <div class="checkbox-item orange">
+                <input type="checkbox" id="orange-checkbox">
+                <label for="orange-checkbox">
+                    <span class="custom-checkbox"></span>
+                    橙色 Checkbox
+                </label>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>禁用状态</h2>
+        <div class="radio-item">
+            <input type="radio" id="disabled-radio" disabled>
+            <label for="disabled-radio">
+                <span class="custom-radio"></span>
+                禁用的 Radio
+            </label>
+        </div>
+        <div class="checkbox-item">
+            <input type="checkbox" id="disabled-checkbox" disabled checked>
+            <label for="disabled-checkbox">
+                <span class="custom-checkbox"></span>
+                禁用的 Checkbox (选中状态)
+            </label>
+        </div>
+    </div>
+</body>
+</html>
