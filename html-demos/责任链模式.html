@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+
+<body>
+  <script>
+    class ResChain {
+      /**
+       * 按顺序存放链的key
+       */
+      keyOrder = []
+      /**
+       * key对应的函数
+       */
+      key2FnMap = new Map()
+      /**
+       * 每个节点都可以拿到的对象
+       */
+      ctx = {}
+      constructor(ctx) {
+        this.ctx = ctx
+      }
+
+      // 这里用key来标识当前callback的唯一性，后面重复添加可以区分。
+      add(key, callback) {
+        if (this.key2FnMap.has(key)) {
+          throw new Error(`Chain ${key} already exists`)
+        }
+
+        this.keyOrder.push(key)
+        this.key2FnMap.set(key, callback)
+        return this
+      }
+
+      async run() {
+        let index = -1
+        const dispatch = (i) => {
+          if (i <= index) {
+            return Promise.reject(new Error('next() called multiple times'))
+          }
+
+          index = i
+          const fn = this.key2FnMap.get(this.keyOrder[i])
+          console.log("🚀 ~ dispatch ~ fn:", fn)
+          if (!fn) {
+            return Promise.resolve(void 0)
+          }
+
+          return fn(this.ctx, dispatch.bind(null, i + 1))
+        }
+
+        return dispatch(0)
+      }
+    }
+
+  </script>
+  <script>
+    const ctx = {
+      // 表单项
+      model: {
+        name: 'gg',
+        phone: '',
+      },
+      // 错误提示
+      error: '',
+      // 是否中断
+      interrupt: false,
+    }
+
+    function test() {
+      const resChain = new ResChain(ctx);
+
+      resChain.add('校验name', ({ model, ...res }, next) => {
+        const { name = '' } = model
+        if (name === '') {
+          ctx.error = '请填写name';
+          ctx.interrupt = true;
+          return;
+        }
+        next();
+      })
+
+      resChain.add('校验phone', ({ model }, next) => {
+        const { phone = '' } = model
+        if (phone === '') {
+          ctx.error = '请填写手机号';
+          ctx.interrupt = true;
+          return;
+        }
+        next();
+      })
+      // 执行责任链
+      resChain.run();
+      // 如果需要中断，则提示
+      if (resChain.ctx.interrupt) {
+        alert(resChain.ctx.error);
+        return;
+      }
+
+    }
+    test()
+
+
+    function pipe(fns = []) {
+      return (data) => {
+        return fns.reduce((prev, curr) => {
+          return prev.then(curr)
+        }, Promise.resolve(data))
+      }
+    }
+
+
+  </script>
+</body>
+
+</html>

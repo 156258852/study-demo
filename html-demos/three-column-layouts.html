@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>三栏布局：Flex, Grid, 浮动</title>
+    <style>
+        /* 公共样式 */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .header, .footer {
+            background-color: #333;
+            color: white;
+            text-align: center;
+            padding: 20px;
+            margin: 10px 0;
+        }
+        
+        .main {
+            min-height: 400px;
+        }
+        
+        .sidebar {
+            background-color: #f4f4f4;
+            padding: 20px;
+        }
+        
+        .content {
+            background-color: #fff;
+            padding: 20px;
+            border: 1px solid #ddd;
+        }
+        
+        h2 {
+            color: #333;
+            border-bottom: 1px solid #ccc;
+            padding-bottom: 10px;
+        }
+        
+        /* Flexbox 布局 */
+        .flex-layout .main {
+            display: flex;
+            gap: 20px;
+        }
+        
+        .flex-layout .sidebar {
+            flex: 1;
+            min-width: 200px;
+        }
+        
+        .flex-layout .content {
+            flex: 2;
+            min-width: 300px;
+        }
+        
+        /* Grid 布局 */
+        .grid-layout .main {
+            display: grid;
+            grid-template-columns: 1fr 2fr 1fr;
+            gap: 20px;
+        }
+        
+        /* 浮动 布局 */
+        .float-layout .main {
+            overflow: hidden; /* 清除浮动 */
+        }
+        
+        .float-layout .left-sidebar {
+            float: left;
+            width: 25%;
+        }
+        
+        .float-layout .content {
+            float: left;
+            width: 50%;
+            margin: 0 20px; /* 使用margin创建间距 */
+        }
+        
+        .float-layout .right-sidebar {
+            float: right;
+            width: 25%;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>三栏布局示例</h1>
+            <p>展示三种不同的三栏布局实现方式：Flexbox、Grid 和 浮动</p>
+        </div>
+        
+        <!-- Flexbox 布局 -->
+        <div class="layout-example flex-layout">
+            <h2>1. Flexbox 布局</h2>
+            <div class="main">
+                <div class="sidebar">
+                    <h3>左侧边栏</h3>
+                    <p>这是左侧边栏的内容。在 Flexbox 布局中，我们使用 flex 属性来控制各列的宽度比例。</p>
+                    <ul>
+                        <li>Flexbox 是一维布局模型</li>
+                        <li>非常适合响应式设计</li>
+                        <li>可以轻松实现垂直居中</li>
+                    </ul>
+                </div>
+                <div class="content">
+                    <h3>主要内容区域</h3>
+                    <p>这是主要内容区域。Flexbox 布局的优势在于它能轻松处理不同屏幕尺寸的适配问题。</p>
+                    <p>Flexbox 布局的核心概念是容器和项目。容器通过 display: flex 声明，项目则自动成为容器的子元素。</p>
+                    <p>主要属性包括：flex-direction、flex-wrap、justify-content、align-items 等。</p>
+                </div>
+                <div class="sidebar">
+                    <h3>右侧边栏</h3>
+                    <p>这是右侧边栏的内容。在 Flexbox 中，我们可以使用 flex: 1、flex: 2 等来设置比例。</p>
+                    <ul>
+                        <li>flex: 1 表示占据剩余空间的1份</li>
+                        <li>flex: 2 表示占据剩余空间的2份</li>
+                        <li>可以轻松调整各列的比例</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Grid 布局 -->
+        <div class="layout-example grid-layout">
+            <h2>2. Grid 布局</h2>
+            <div class="main">
+                <div class="sidebar">
+                    <h3>左侧边栏</h3>
+                    <p>这是左侧边栏的内容。在 Grid 布局中，我们使用 grid-template-columns 来定义列宽。</p>
+                    <ul>
+                        <li>Grid 是二维布局模型</li>
+                        <li>可以同时控制行和列</li>
+                        <li>更精确的网格控制</li>
+                    </ul>
+                </div>
+                <div class="content">
+                    <h3>主要内容区域</h3>
+                    <p>这是主要内容区域。Grid 布局通过 grid-template-columns: 1fr 2fr 1fr 定义三列的比例。</p>
+                    <p>CSS Grid 布局是目前最强大的 CSS 布局系统之一，它是一个基于网格的二维布局系统。</p>
+                    <p>Grid 布局非常适合复杂的网页布局，可以轻松实现各种对齐和分布方式。</p>
+                </div>
+                <div class="sidebar">
+                    <h3>右侧边栏</h3>
+                    <p>这是右侧边栏的内容。Grid 布局中使用 fr 单位来表示可用空间的分数。</p>
+                    <ul>
+                        <li>1fr 表示可用空间的1份</li>
+                        <li>2fr 表示可用空间的2份</li>
+                        <li>可以创建复杂的网格结构</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 浮动 布局 -->
+        <div class="layout-example float-layout">
+            <h2>3. 浮动 布局</h2>
+            <div class="main">
+                <div class="sidebar left-sidebar">
+                    <h3>左侧边栏</h3>
+                    <p>这是左侧边栏的内容。在浮动布局中，我们使用 float 属性来实现多列布局。</p>
+                    <ul>
+                        <li>浮动最初用于文字环绕效果</li>
+                        <li>后来被用于页面布局</li>
+                        <li>需要清除浮动来避免布局问题</li>
+                    </ul>
+                </div>
+                <div class="content">
+                    <h3>主要内容区域</h3>
+                    <p>这是主要内容区域。浮动布局通过 float: left 和 float: right 实现多列布局。</p>
+                    <p>浮动布局是较早的 CSS 布局方式，在 Flexbox 和 Grid 出现之前广泛使用。</p>
+                    <p>需要注意清除浮动以避免父元素高度塌陷的问题，通常使用 overflow: hidden 或 clearfix 技术。</p>
+                </div>
+                <div class="sidebar right-sidebar">
+                    <h3>右侧边栏</h3>
+                    <p>这是右侧边栏的内容。在浮动布局中，宽度通常使用百分比或固定值。</p>
+                    <ul>
+                        <li>需要计算各列的宽度和间距</li>
+                        <li>容易出现高度塌陷问题</li>
+                        <li>响应式处理相对复杂</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p>三种三栏布局方式对比</p>
+        </div>
+    </div>
+</body>
+</html>

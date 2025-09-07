@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>横向时间轴</title>
+    <style>
+        /*
+         * 横向时间轴样式
+         * 使用Flexbox实现响应式布局
+         * 支持桌面端和移动端显示
+         */
+        /*
+         * 基本样式重置
+         * 统一浏览器默认样式
+         */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /*
+         * 页面主体样式
+         * 设置字体、背景色和内边距
+         */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
+            padding: 20px;
+        }
+
+        /*
+         * 容器样式
+         * 限制最大宽度并居中显示
+         */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /*
+         * 标题样式
+         * 居中显示并设置颜色和大小
+         */
+        h1 {
+            text-align: center;
+            margin-bottom: 40px;
+            color: #2c3e50;
+            font-size: 2.5rem;
+        }
+
+        /*
+         * 时间轴容器
+         * 相对定位，为时间轴主线提供定位上下文
+         */
+        .timeline {
+            position: relative;
+            padding: 20px 0;
+        }
+
+        /*
+         * 时间轴主线
+         * 使用伪元素创建时间轴的垂直线
+         * 居中显示并设置样式
+         */
+        .timeline::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            background: #3498db;
+            left: 50%;
+            transform: translateX(-50%);
+            border-radius: 2px;
+        }
+
+        /*
+         * 时间轴节点
+         * 使用Flexbox实现左右交替布局
+         * 设置相对定位和外边距
+         */
+        .timeline-item {
+            position: relative;
+            margin-bottom: 50px;
+            width: 100%;
+            display: flex;
+        }
+
+        /*
+         * 奇数节点左对齐
+         */
+        .timeline-item:nth-child(odd) {
+            justify-content: flex-start;
+        }
+
+        /*
+         * 偶数节点右对齐
+         */
+        .timeline-item:nth-child(even) {
+            justify-content: flex-end;
+        }
+
+        /*
+         * 时间轴内容卡片
+         * 设置宽度、背景色、内边距和阴影
+         * 添加悬停效果提升用户体验
+         */
+        .timeline-content {
+            width: 45%;
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+            position: relative;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        /*
+         * 内容卡片悬停效果
+         * 向上轻微移动并增强阴影
+         */
+        .timeline-content:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        /*
+         * 奇数节点内容右对齐
+         */
+        .timeline-item:nth-child(odd) .timeline-content {
+            margin-right: auto;
+        }
+
+        /*
+         * 偶数节点内容左对齐
+         */
+        .timeline-item:nth-child(even) .timeline-content {
+            margin-left: auto;
+        }
+
+        /*
+         * 时间轴节点圆点
+         * 使用伪元素创建圆形节点
+         * 居中显示在时间轴主线上
+         */
+        .timeline-item::after {
+            content: '';
+            position: absolute;
+            width: 22px;
+            height: 22px;
+            background: #3498db;
+            border: 5px solid #fff;
+            border-radius: 50%;
+            top: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+        }
+
+        /*
+         * 时间节点日期样式
+         * 圆角矩形背景，白色文字
+         */
+        .timeline-date {
+            display: inline-block;
+            background: #3498db;
+            color: white;
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            font-size: 0.9rem;
+        }
+
+        /*
+         * 时间节点标题样式
+         */
+        .timeline-title {
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            color: #2c3e50;
+        }
+
+        /*
+         * 时间节点描述样式
+         */
+        .timeline-description {
+            color: #7f8c8d;
+            line-height: 1.7;
+        }
+
+        /*
+         * 平板及以下屏幕响应式设计
+         * 将时间轴调整为左侧对齐的单列布局
+         */
+        @media (max-width: 768px) {
+            /* 调整时间轴主线位置 */
+            .timeline::before {
+                left: 31px;
+            }
+
+            /* 调整时间节点布局为左侧对齐 */
+            .timeline-item {
+                width: 100%;
+                padding-left: 70px;
+                padding-right: 0;
+                justify-content: flex-start !important;
+            }
+
+            /* 调整时间节点圆点位置 */
+            .timeline-item::after {
+                left: 31px;
+                top: 35px;
+            }
+
+            /* 调整内容卡片宽度和内边距 */
+            .timeline-content {
+                width: calc(100% - 70px);
+                margin-right: 0 !important;
+                margin-left: 0 !important;
+                padding: 20px;
+            }
+
+            /* 确保偶数节点内容也左对齐 */
+            .timeline-item:nth-child(even) .timeline-content {
+                margin-left: 0;
+            }
+            
+            /* 调整标题字体大小 */
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .timeline-title {
+                font-size: 1.3rem;
+            }
+        }
+        
+        /*
+         * 手机屏幕响应式设计
+         * 进一步优化小屏幕显示效果
+         */
+        @media (max-width: 480px) {
+            /* 减少页面内边距 */
+            body {
+                padding: 10px;
+            }
+            
+            .container {
+                padding: 10px;
+            }
+            
+            /* 调整时间节点内边距和外边距 */
+            .timeline-item {
+                padding-left: 50px;
+                margin-bottom: 40px;
+            }
+            
+            /* 调整时间轴主线位置 */
+            .timeline::before {
+                left: 21px;
+            }
+            
+            /* 调整时间节点圆点大小 */
+            .timeline-item::after {
+                left: 21px;
+                width: 18px;
+                height: 18px;
+                border-width: 4px;
+            }
+            
+            /* 调整内容卡片宽度和内边距 */
+            .timeline-content {
+                width: calc(100% - 50px);
+                padding: 15px;
+            }
+            
+            /* 调整日期标签内边距和字体大小 */
+            .timeline-date {
+                padding: 4px 12px;
+                font-size: 0.8rem;
+            }
+            
+            /* 调整标题字体大小 */
+            .timeline-title {
+                font-size: 1.2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>项目发展历程</h1>
+        
+        <div class="timeline">
+            <!-- 时间轴节点 1 -->
+            <div class="timeline-item">
+                <div class="timeline-content">
+                    <span class="timeline-date">2020年1月</span>
+                    <h2 class="timeline-title">项目启动</h2>
+                    <p class="timeline-description">项目正式启动，团队成立并制定了初步的开发计划。确定了项目的核心目标和关键技术栈。</p>
+                </div>
+            </div>
+            
+            <!-- 时间轴节点 2 -->
+            <div class="timeline-item">
+                <div class="timeline-content">
+                    <span class="timeline-date">2020年3月</span>
+                    <h2 class="timeline-title">原型设计</h2>
+                    <p class="timeline-description">完成了产品的原型设计，包括用户界面和用户体验流程。进行了多轮内部评审和优化。</p>
+                </div>
+            </div>
+            
+            <!-- 时间轴节点 3 -->
+            <div class="timeline-item">
+                <div class="timeline-content">
+                    <span class="timeline-date">2020年6月</span>
+                    <h2 class="timeline-title">核心功能开发</h2>
+                    <p class="timeline-description">开始核心功能的开发工作，实现了用户认证、数据管理和基础业务逻辑。</p>
+                </div>
+            </div>
+            
+            <!-- 时间轴节点 4 -->
+            <div class="timeline-item">
+                <div class="timeline-content">
+                    <span class="timeline-date">2020年9月</span>
+                    <h2 class="timeline-title">测试与优化</h2>
+                    <p class="timeline-description">进行了全面的测试，包括单元测试、集成测试和用户验收测试。根据反馈进行了多轮优化。</p>
+                </div>
+            </div>
+            
+            <!-- 时间轴节点 5 -->
+            <div class="timeline-item">
+                <div class="timeline-content">
+                    <span class="timeline-date">2020年12月</span>
+                    <h2 class="timeline-title">正式发布</h2>
+                    <p class="timeline-description">产品正式上线发布，向公众开放。获得了积极的用户反馈和市场反响。</p>
+                </div>
+            </div>
+            
+            <!-- 时间轴节点 6 -->
+            <div class="timeline-item">
+                <div class="timeline-content">
+                    <span class="timeline-date">2021年3月</span>
+                    <h2 class="timeline-title">功能扩展</h2>
+                    <p class="timeline-description">根据用户需求和市场反馈，增加了新的功能模块，提升了产品的竞争力。</p>
+                </div>
+            </div>
+            
+            <!-- 时间轴节点 7 -->
+            <div class="timeline-item">
+                <div class="timeline-content">
+                    <span class="timeline-date">2021年8月</span>
+                    <h2 class="timeline-title">国际化支持</h2>
+                    <p class="timeline-description">为了拓展国际市场，我们为产品添加了多语言支持，包括英语、西班牙语和法语。</p>
+                </div>
+            </div>
+            
+            <!-- 时间轴节点 8 -->
+            <div class="timeline-item">
+                <div class="timeline-content">
+                    <span class="timeline-date">2022年1月</span>
+                    <h2 class="timeline-title">移动端优化</h2>
+                    <p class="timeline-description">针对移动设备用户，我们发布了专门的移动端应用，并优化了移动浏览器的体验。</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CSRF 攻击详细过程</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        
+        .container {
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        
+        h1, h2 {
+            color: #333;
+        }
+        
+        .danger {
+            color: #d32f2f;
+            background-color: #ffebee;
+            padding: 10px;
+            border-radius: 4px;
+        }
+        
+        .info {
+            color: #1976d2;
+            background-color: #e3f2fd;
+            padding: 10px;
+            border-radius: 4px;
+        }
+        
+        .example {
+            background-color: #f5f5f5;
+            padding: 15px;
+            border-left: 4px solid #2196F3;
+            margin: 15px 0;
+        }
+        
+        .step {
+            background-color: #fff3e0;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 10px 0;
+            border-left: 4px solid #ff9800;
+        }
+        
+        .browser-action {
+            background-color: #e8f5e9;
+            padding: 10px;
+            border-left: 3px solid #4caf50;
+            margin: 10px 0;
+        }
+        
+        .attacker-code {
+            background-color: #ffebee;
+            padding: 15px;
+            border-left: 4px solid #f44336;
+            font-family: monospace;
+            white-space: pre-wrap;
+        }
+        
+        .network-packet {
+            background-color: #f1f8e9;
+            padding: 15px;
+            border: 1px solid #c5e1a5;
+            border-radius: 4px;
+            font-family: monospace;
+            white-space: pre-wrap;
+        }
+        
+        .highlight {
+            background-color: #ffff00;
+            padding: 2px 4px;
+        }
+        
+        .timeline {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .timeline-item {
+            display: flex;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        
+        .timeline-time {
+            background-color: #2196F3;
+            color: white;
+            padding: 10px;
+            font-weight: bold;
+            min-width: 100px;
+        }
+        
+        .timeline-content {
+            padding: 10px;
+            flex: 1;
+        }
+    </style>
+</head>
+<body>
+    <h1>CSRF 攻击详细过程解析</h1>
+    <p>重点解答："攻击者如何拿到银行的Cookie？"</p>
+    
+    <div class="container">
+        <h2>关键答案：攻击者<strong>不需要</strong>拿到银行的Cookie！</h2>
+        <div class="danger">
+            <h3>重要理解：</h3>
+            <ul>
+                <li>攻击者<strong>无法</strong>通过JavaScript直接读取银行网站的Cookie（同源策略阻止）</li>
+                <li>攻击者<strong>不需要</strong>获取Cookie，因为浏览器会自动附加</li>
+                <li>攻击者只需要<strong>诱导用户浏览器向银行网站发起请求</strong></li>
+            </ul>
+        </div>
+    </div>
+    
+    <div class="container">
+        <h2>完整攻击流程</h2>
+        
+        <div class="timeline">
+            <div class="timeline-item">
+                <div class="timeline-time">步骤 1</div>
+                <div class="timeline-content">
+                    <h3>用户登录银行网站</h3>
+                    <div class="example">
+                        <p>用户访问 <span class="highlight">https://bank.example.com</span> 并登录</p>
+                        <p>银行服务器响应：</p>
+                        <div class="network-packet">HTTP/1.1 200 OK
+Set-Cookie: sessionid=abc123; Domain=example.com; Secure; HttpOnly
+Content-Type: text/html
+
+&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;head&gt;&lt;title&gt;网上银行&lt;/title&gt;&lt;/head&gt;
+&lt;body&gt;
+  &lt;h1&gt;欢迎，张三&lt;/h1&gt;
+  &lt;form action="/transfer" method="POST"&gt;
+    &lt;input type="text" name="to" placeholder="收款人"&gt;
+    &lt;input type="number" name="amount" placeholder="金额"&gt;
+    &lt;button type="submit"&gt;转账&lt;/button&gt;
+  &lt;/form&gt;
+&lt;/body&gt;
+&lt;/html&gt;</div>
+                    </div>
+                    <div class="browser-action">
+                        <strong>浏览器行为：</strong>
+                        <ul>
+                            <li>保存 sessionid=abc123 Cookie，作用域为 example.com</li>
+                            <li>后续向 example.com 域的请求都会自动附加此 Cookie</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="timeline-item">
+                <div class="timeline-time">步骤 2</div>
+                <div class="timeline-content">
+                    <h3>用户访问恶意网站</h3>
+                    <div class="example">
+                        <p>用户在未登出银行网站的情况下访问 <span class="highlight">https://evil.com</span></p>
+                        <p>恶意网站内容：</p>
+                        <div class="attacker-code">&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;head&gt;&lt;title&gt;免费礼品&lt;/title&gt;&lt;/head&gt;
+&lt;body&gt;
+  &lt;h1&gt;点击领取免费礼品&lt;/h1&gt;
+  &lt;button onclick="performAttack()"&gt;领取礼品&lt;/button&gt;
+  
+  &lt;!-- 攻击者构造的隐藏表单 --&gt;
+  &lt;form id="attack-form" method="POST" action="https://bank.example.com/transfer"&gt;
+    &lt;input type="hidden" name="to" value="attacker_account"&gt;
+    &lt;input type="hidden" name="amount" value="5000"&gt;
+  &lt;/form&gt;
+  
+  &lt;script&gt;
+    function performAttack() {
+      // 攻击者不需要获取银行Cookie
+      // 只需要提交表单到银行网站
+      document.getElementById('attack-form').submit();
+    }
+  &lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;</div>
+                    </div>
+                    <div class="info">
+                        <p><strong>关键点：</strong>攻击者<strong>没有</strong>获取到 sessionid=abc123，他们甚至无法通过JavaScript读取它（同源策略阻止）</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="timeline-item">
+                <div class="timeline-time">步骤 3</div>
+                <div class="timeline-content">
+                    <h3>攻击代码执行</h3>
+                    <div class="example">
+                        <p>用户点击"领取礼品"按钮，执行攻击代码</p>
+                        <div class="attacker-code">// 攻击者代码只需要这样做：
+document.getElementById('attack-form').submit();
+
+// 攻击者<strong>不需要</strong>也不<strong>不能</strong>做这样的事：
+// var cookie = getBankCookie(); // 这行代码会被同源策略阻止！
+// fetch('https://bank.example.com/transfer', {
+//   headers: {'Cookie': cookie} // 这也不行！
+// });</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="timeline-item">
+                <div class="timeline-time">步骤 4</div>
+                <div class="timeline-content">
+                    <h3>浏览器发起请求并自动附加Cookie</h3>
+                    <div class="example">
+                        <p>浏览器向银行网站提交表单</p>
+                        <div class="network-packet">POST https://bank.example.com/transfer HTTP/1.1
+Host: bank.example.com
+Content-Type: application/x-www-form-urlencoded
+Cookie: sessionid=abc123  &lt;-- 浏览器自动附加！攻击者没有手动添加！
+
+to=attacker_account&amount=5000</div>
+                    </div>
+                    <div class="browser-action">
+                        <strong>浏览器自动处理：</strong>
+                        <ul>
+                            <li>检查请求目标：bank.example.com</li>
+                            <li>检查本地Cookie存储</li>
+                            <li>发现有匹配作用域的Cookie：sessionid=abc123</li>
+                            <li><strong>自动附加该Cookie到请求中</strong></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="timeline-item">
+                <div class="timeline-time">步骤 5</div>
+                <div class="timeline-content">
+                    <h3>银行服务器处理请求</h3>
+                    <div class="example">
+                        <p>银行服务器收到请求</p>
+                        <div class="network-packet">POST /transfer HTTP/1.1
+Cookie: sessionid=abc123
+Content-Type: application/x-www-form-urlencoded
+
+to=attacker_account&amount=5000</div>
+                        <div class="browser-action">
+                            <ul>
+                                <li>验证Cookie有效</li>
+                                <li>确认是已登录用户</li>
+                                <li>执行转账操作</li>
+                                <li>用户资金被盗</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="danger">
+                        <p><strong>整个过程中：</strong></p>
+                        <ul>
+                            <li>攻击者<strong>从未</strong>获取到用户的Cookie</li>
+                            <li>攻击者<strong>只是</strong>诱导用户浏览器向银行网站发起请求</li>
+                            <li>浏览器<strong>自动</strong>根据Cookie作用域规则附加了Cookie</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="container">
+        <h2>为什么同源策略没有阻止攻击？</h2>
+        <div class="info">
+            <p>同源策略主要限制以下操作：</p>
+            <ul>
+                <li>JavaScript 读取其他域的 DOM 内容</li>
+                <li>JavaScript 读取其他域的 Cookie</li>
+                <li>JavaScript 读取其他域的响应内容</li>
+            </ul>
+            
+            <p>但同源策略<strong>不限制</strong>：</p>
+            <ul>
+                <li>向其他域发起请求（如表单提交、图片加载等）</li>
+                <li>浏览器自动附加匹配作用域的 Cookie</li>
+            </ul>
+        </div>
+    </div>
+    
+    <div class="container">
+        <h2>CSRF 防护原理</h2>
+        <div class="info">
+            <p>CSRF Token 能防护攻击的原因：</p>
+            <ul>
+                <li>Token 值存储在银行网站的 DOM 中</li>
+                <li>攻击者无法通过 JavaScript 读取（同源策略阻止）</li>
+                <li>攻击者构造的表单中<strong>不包含</strong>有效的 Token</li>
+                <li>银行服务器验证 Token 失败，拒绝请求</li>
+            </ul>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>水平时间轴组件</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 40px;
+            color: #2c3e50;
+            font-size: 2.5rem;
+        }
+
+        .timeline-horizontal {
+            position: relative;
+            padding: 40px 0;
+        }
+
+        /* 主轴线 */
+        .timeline-horizontal::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: #1976d2;
+            transform: translateY(-50%);
+            z-index: 1;
+        }
+
+        .timeline-item {
+            position: relative;
+            margin-bottom: 60px;
+            display: flex;
+            align-items: center;
+            min-height: 200px;
+        }
+
+        .timeline-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .content-top,
+        .content-bottom {
+            flex: 1;
+            position: relative;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+        }
+
+        .content-top {
+            align-self: flex-start;
+        }
+
+        .content-bottom {
+            align-self: flex-end;
+        }
+
+        .timeline-node {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+            padding: 0 20px;
+        }
+
+        .time-display {
+            display: block;
+            font-weight: bold;
+            color: #1976d2;
+            margin-bottom: 10px;
+            font-size: 1rem;
+        }
+
+        .main-dot {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: #ff6b35;
+            margin: 0 auto;
+            border: 4px solid #fff;
+            box-shadow: 0 0 0 2px #1976d2;
+        }
+
+        .content-card {
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            max-width: 300px;
+            transition: all 0.3s ease;
+            border-left: 4px solid #1976d2;
+        }
+
+        .content-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .content-card h3 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+
+        .content-card p {
+            color: #7f8c8d;
+            font-size: 0.95rem;
+        }
+
+        .dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #ff6b35;
+            position: absolute;
+        }
+
+        .connector-line {
+            position: absolute;
+            background: repeating-linear-gradient(
+                to bottom,
+                #7f8c8d,
+                #7f8c8d 2px,
+                transparent 2px,
+                transparent 5px
+            );
+        }
+
+        /* 上方内容样式 */
+        .content-top .dot {
+            bottom: 0;
+            right: -6px;
+            transform: translate(50%, 50%);
+        }
+
+        .content-top .connector-line {
+            width: 2px;
+            height: 30px;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .content-top .time-display {
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            margin-bottom: 10px;
+        }
+
+        /* 下方内容样式 */
+        .content-bottom .dot {
+            top: 0;
+            left: -6px;
+            transform: translate(-50%, -50%);
+        }
+
+        .content-bottom .connector-line {
+            width: 2px;
+            height: 30px;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .content-bottom .time-display {
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            margin-top: 10px;
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 1024px) {
+            .container {
+                padding: 20px 15px;
+            }
+            
+            .content-card {
+                max-width: 250px;
+                padding: 15px;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .timeline-horizontal::before {
+                top: 40px;
+                transform: none;
+            }
+            
+            .timeline-item {
+                flex-direction: column;
+                min-height: auto;
+                margin-bottom: 80px;
+            }
+            
+            .content-top,
+            .content-bottom {
+                width: 100%;
+                justify-content: center;
+                order: 3;
+                padding: 60px 20px 20px;
+            }
+            
+            .timeline-node {
+                order: 2;
+                padding: 20px 0;
+            }
+            
+            .content-top .dot,
+            .content-bottom .dot {
+                top: auto;
+                bottom: -6px;
+                left: 50%;
+                right: auto;
+                transform: translate(-50%, 50%);
+            }
+            
+            .content-top .connector-line,
+            .content-bottom .connector-line {
+                width: 2px;
+                height: 30px;
+                top: auto;
+                bottom: 100%;
+                left: 50%;
+                transform: translateX(-50%);
+            }
+            
+            .content-top .time-display,
+            .content-bottom .time-display {
+                top: auto;
+                bottom: 100%;
+                margin-top: 0;
+                margin-bottom: 10px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 20px 10px;
+            }
+            
+            h1 {
+                font-size: 1.75rem;
+            }
+            
+            .content-card {
+                max-width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>水平时间轴组件</h1>
+        
+        <div class="timeline-horizontal">
+            <!-- 时间轴项目 1 -->
+            <div class="timeline-item">
+                <div class="content-top">
+                    <div class="content-card">
+                        <h3>项目启动</h3>
+                        <p>项目正式启动，团队成员确定，开始制定项目计划和里程碑。</p>
+                    </div>
+                    <div class="dot"></div>
+                    <div class="connector-line"></div>
+                    <span class="time-display">2023年1月</span>
+                </div>
+                
+                <div class="timeline-node">
+                    <span class="time-display">阶段一</span>
+                    <div class="main-dot"></div>
+                </div>
+                
+                <div class="content-bottom">
+                    <div class="dot"></div>
+                    <div class="connector-line"></div>
+                    <span class="time-display">2023年2月</span>
+                    <div class="content-card">
+                        <h3>需求分析</h3>
+                        <p>与客户深入沟通，明确项目需求，完成需求文档编写和评审。</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 时间轴项目 2 -->
+            <div class="timeline-item">
+                <div class="content-top">
+                    <div class="content-card">
+                        <h3>设计阶段</h3>
+                        <p>UI/UX设计师完成界面设计，开发团队制定技术方案。</p>
+                    </div>
+                    <div class="dot"></div>
+                    <div class="connector-line"></div>
+                    <span class="time-display">2023年3月</span>
+                </div>
+                
+                <div class="timeline-node">
+                    <span class="time-display">阶段二</span>
+                    <div class="main-dot"></div>
+                </div>
+                
+                <div class="content-bottom">
+                    <div class="dot"></div>
+                    <div class="connector-line"></div>
+                    <span class="time-display">2023年4月</span>
+                    <div class="content-card">
+                        <h3>开发启动</h3>
+                        <p>前端和后端开发并行开始，建立代码仓库和开发环境。</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 时间轴项目 3 -->
+            <div class="timeline-item">
+                <div class="content-top">
+                    <div class="content-card">
+                        <h3>功能开发</h3>
+                        <p>核心功能模块开发完成，进行单元测试和代码评审。</p>
+                    </div>
+                    <div class="dot"></div>
+                    <div class="connector-line"></div>
+                    <span class="time-display">2023年5月</span>
+                </div>
+                
+                <div class="timeline-node">
+                    <span class="time-display">阶段三</span>
+                    <div class="main-dot"></div>
+                </div>
+                
+                <div class="content-bottom">
+                    <div class="dot"></div>
+                    <div class="connector-line"></div>
+                    <span class="time-display">2023年6月</span>
+                    <div class="content-card">
+                        <h3>测试阶段</h3>
+                        <p>进行全面的功能测试、性能测试和安全测试。</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 时间轴项目 4 -->
+            <div class="timeline-item">
+                <div class="content-top">
+                    <div class="content-card">
+                        <h3>优化调整</h3>
+                        <p>根据测试反馈进行问题修复和性能优化。</p>
+                    </div>
+                    <div class="dot"></div>
+                    <div class="connector-line"></div>
+                    <span class="time-display">2023年7月</span>
+                </div>
+                
+                <div class="timeline-node">
+                    <span class="time-display">阶段四</span>
+                    <div class="main-dot"></div>
+                </div>
+                
+                <div class="content-bottom">
+                    <div class="dot"></div>
+                    <div class="connector-line"></div>
+                    <span class="time-display">2023年8月</span>
+                    <div class="content-card">
+                        <h3>项目交付</h3>
+                        <p>完成所有开发和测试工作，正式交付给客户使用。</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

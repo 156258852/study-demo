@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>clientHeight 和 clientWidth 属性演示</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f5f5f5;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        
+        .main-content {
+            display: flex;
+            gap: 20px;
+        }
+        
+        .info-section {
+            flex: 1;
+            min-width: 300px;
+        }
+        
+        .demo-section {
+            flex: 2;
+            min-width: 400px;
+        }
+        
+        .demo-box {
+            width: 300px;
+            height: 200px;
+            padding: 20px;
+            margin: 20px 0;
+            border: 10px solid #3498db;
+            background-color: #ecf0f1;
+            overflow: auto;
+            box-sizing: content-box;
+        }
+        
+        .content {
+            width: 400px;
+            height: 300px;
+            background: linear-gradient(135deg, #6e8efb, #a777e3);
+        }
+        
+        .info-panel {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 15px;
+            margin: 20px 0;
+        }
+        
+        .info-card {
+            background-color: #e9ecef;
+            padding: 15px;
+            border-radius: 5px;
+        }
+        
+        .info-card h3 {
+            margin-top: 0;
+            color: #007bff;
+        }
+        
+        .value {
+            font-size: 20px;
+            font-weight: bold;
+            color: #333;
+        }
+        
+        .explanation {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #e7f3ff;
+            border-left: 4px solid #007bff;
+        }
+        
+        .dimension-box {
+            display: flex;
+            flex-wrap: wrap;
+            margin: 20px 0;
+        }
+        
+        .dimension-item {
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin: 5px;
+            text-align: center;
+            flex: 1;
+            min-width: 120px;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+        }
+        
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        
+        th {
+            background-color: #f2f2f2;
+        }
+        
+        .highlight {
+            background-color: #fff3cd;
+            padding: 2px 4px;
+            border-radius: 3px;
+            font-weight: bold;
+        }
+        
+        @media (max-width: 768px) {
+            .main-content {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>clientHeight 和 clientWidth 属性演示</h1>
+        
+        <div class="main-content">
+            <div class="info-section">
+                <div class="info-panel">
+                    <div class="info-card">
+                        <h3>元素尺寸信息</h3>
+                        <div>clientWidth: <span id="clientWidth" class="value">0</span> px</div>
+                        <div>clientHeight: <span id="clientHeight" class="value">0</span> px</div>
+                        <div>offsetWidth: <span id="offsetWidth" class="value">0</span> px</div>
+                        <div>offsetHeight: <span id="offsetHeight" class="value">0</span> px</div>
+                        <div>scrollWidth: <span id="scrollWidth" class="value">0</span> px</div>
+                        <div>scrollHeight: <span id="scrollHeight" class="value">0</span> px</div>
+                    </div>
+                </div>
+                
+                <div class="dimension-box">
+                    <div class="dimension-item">
+                        <h3>clientWidth</h3>
+                        <p>内容 + padding</p>
+                        <p>不包括border, margin, scrollbar</p>
+                    </div>
+                    <div class="dimension-item">
+                        <h3>clientHeight</h3>
+                        <p>内容 + padding</p>
+                        <p>不包括border, margin, scrollbar</p>
+                    </div>
+                </div>
+                
+                <table>
+                    <tr>
+                        <th>属性</th>
+                        <th>包含内容</th>
+                        <th>说明</th>
+                    </tr>
+                    <tr>
+                        <td>clientWidth</td>
+                        <td>内容宽度 + padding</td>
+                        <td>不包括边框、外边距和滚动条</td>
+                    </tr>
+                    <tr>
+                        <td>clientHeight</td>
+                        <td>内容高度 + padding</td>
+                        <td>不包括边框、外边距和滚动条</td>
+                    </tr>
+                    <tr>
+                        <td>offsetWidth</td>
+                        <td>内容 + padding + border</td>
+                        <td>包括边框，但不包括外边距和滚动条</td>
+                    </tr>
+                    <tr>
+                        <td>offsetHeight</td>
+                        <td>内容 + padding + border</td>
+                        <td>包括边框，但不包括外边距和滚动条</td>
+                    </tr>
+                    <tr>
+                        <td>scrollWidth</td>
+                        <td>完整内容宽度</td>
+                        <td>包括因溢出而被隐藏的部分</td>
+                    </tr>
+                    <tr>
+                        <td>scrollHeight</td>
+                        <td>完整内容高度</td>
+                        <td>包括因溢出而被隐藏的部分</td>
+                    </tr>
+                </table>
+                
+                <div class="explanation">
+                    <h3>属性解释</h3>
+                    <ul>
+                        <li><strong>clientWidth/clientHeight</strong>: 元素内部的尺寸，包括内容和内边距(padding)，但不包括边框(border)、外边距(margin)或滚动条</li>
+                        <li><strong>计算公式</strong>: 
+                            <ul>
+                                <li>clientWidth = CSS width + CSS padding-left + CSS padding-right</li>
+                                <li>clientHeight = CSS height + CSS padding-top + CSS padding-bottom</li>
+                            </ul>
+                        </li>
+                        <li>对于本例中的元素（宽300px，高200px，padding 20px，border 10px）：
+                            <ul>
+                                <li>clientWidth = 300 + 20 + 20 = 340px</li>
+                                <li>clientHeight = 200 + 20 + 20 = 240px</li>
+                                <li>offsetWidth = 300 + 20 + 20 + 10 + 10 = 360px</li>
+                                <li>offsetHeight = 200 + 20 + 20 + 10 + 10 = 260px</li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="demo-section">
+                <div class="explanation">
+                    <h3>演示元素结构</h3>
+                    <p>下面的彩色框是一个具有以下CSS属性的元素：</p>
+                    <ul>
+                        <li>width: 300px</li>
+                        <li>height: 200px</li>
+                        <li>padding: 20px</li>
+                        <li>border: 10px solid</li>
+                        <li>background-color: #ecf0f1</li>
+                        <li>overflow: auto</li>
+                    </ul>
+                    <p>蓝色边框表示元素的边界，内部的紫色渐变区域是内容区域。</p>
+                </div>
+                
+                <div id="demoBox" class="demo-box">
+                    <div class="content"></div>
+                </div>
+                
+                <div class="explanation">
+                    <h3>实际应用场景</h3>
+                    <ul>
+                        <li>响应式设计中计算可用空间</li>
+                        <li>动态调整元素大小</li>
+                        <li>实现自定义滚动条</li>
+                        <li>创建全屏或适应性布局</li>
+                        <li>计算元素相对于视口的位置</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const demoBox = document.getElementById('demoBox');
+        
+        // 更新尺寸信息
+        function updateDimensions() {
+            document.getElementById('clientWidth').textContent = demoBox.clientWidth;
+            document.getElementById('clientHeight').textContent = demoBox.clientHeight;
+            document.getElementById('offsetWidth').textContent = demoBox.offsetWidth;
+            document.getElementById('offsetHeight').textContent = demoBox.offsetHeight;
+            document.getElementById('scrollWidth').textContent = demoBox.scrollWidth;
+            document.getElementById('scrollHeight').textContent = demoBox.scrollHeight;
+        }
+        
+        // 页面加载完成后初始化
+        window.addEventListener('load', function() {
+            updateDimensions();
+        });
+        
+        // 窗口大小改变时更新
+        window.addEventListener('resize', updateDimensions);
+    </script>
+</body>
+</html>

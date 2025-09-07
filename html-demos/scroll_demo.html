@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>scrollTop 和 scrollHeight 比较</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f5f5f5;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .scroll-box {
+            height: 200px;
+            width: 100%;
+            border: 2px solid #333;
+            overflow-y: scroll;
+            padding: 10px;
+            margin: 20px 0;
+            background-color: #f9f9f9;
+        }
+        
+        .content {
+            height: 800px;
+            background: linear-gradient(to bottom, #ff9966, #ff5e62);
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        
+        .info-panel {
+            display: flex;
+            justify-content: space-between;
+            background-color: #e9ecef;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+        
+        .info-item {
+            text-align: center;
+            flex: 1;
+        }
+        
+        .info-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #007bff;
+        }
+        
+        .controls {
+            margin: 20px 0;
+        }
+        
+        button {
+            padding: 10px 15px;
+            margin: 5px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        
+        button:hover {
+            background-color: #0056b3;
+        }
+        
+        .explanation {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #e7f3ff;
+            border-left: 4px solid #007bff;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>scrollTop 和 scrollHeight 比较</h1>
+        
+        <div class="info-panel">
+            <div class="info-item">
+                <div>scrollTop</div>
+                <div id="scroll-top" class="info-value">0</div>
+                <div>像素</div>
+            </div>
+            <div class="info-item">
+                <div>scrollHeight</div>
+                <div id="scroll-height" class="info-value">0</div>
+                <div>像素</div>
+            </div>
+            <div class="info-item">
+                <div>clientHeight</div>
+                <div id="client-height" class="info-value">0</div>
+                <div>像素</div>
+            </div>
+            <div class="info-item">
+                <div>百分比</div>
+                <div id="percentage" class="info-value">0%</div>
+                <div>已滚动</div>
+            </div>
+        </div>
+        
+        <div class="controls">
+            <button onclick="scrollToTop()">滚动到顶部</button>
+            <button onclick="scrollToMiddle()">滚动到中间</button>
+            <button onclick="scrollToBottom()">滚动到底部</button>
+        </div>
+        
+        <div id="scrollBox" class="scroll-box" onscroll="updateScrollInfo()">
+            <div class="content">
+                <h2>可滚动内容区域</h2>
+                <p>这是一个用于演示scrollTop和scrollHeight属性的示例。</p>
+                <p><strong>scrollTop</strong>: 表示元素内容垂直滚动的像素数。如果元素没有滚动，则为0。</p>
+                <p><strong>scrollHeight</strong>: 表示元素内容的总高度，包括由于溢出而不可见的部分。</p>
+                <p><strong>clientHeight</strong>: 表示元素内部的高度，不包括水平滚动条、边框和外边距。</p>
+                
+                <p>通过比较这些值，我们可以了解元素的滚动状态：</p>
+                <ul>
+                    <li>当 scrollTop 为 0 时，表示元素在顶部</li>
+                    <li>当 scrollTop + clientHeight 接近 scrollHeight 时，表示接近底部</li>
+                    <li>可以使用公式 (scrollTop / (scrollHeight - clientHeight) * 100) 计算滚动百分比</li>
+                </ul>
+                
+                <p>继续向下滚动以查看更多内容...</p>
+                
+                <h3>实际应用</h3>
+                <p>这些属性常用于以下场景：</p>
+                <ol>
+                    <li>实现无限滚动加载</li>
+                    <li>显示滚动进度条</li>
+                    <li>返回顶部按钮的显示/隐藏</li>
+                    <li>懒加载图片或内容</li>
+                </ol>
+                
+                <p>当您滚动此区域时，顶部的数值将实时更新，显示当前的scrollTop、scrollHeight和clientHeight值。</p>
+                
+                <h3>更多信息</h3>
+                <p>scrollHeight是一个只读属性，它返回元素内容的高度，包括由于溢出而不可见的部分。它包括元素的padding，但不包括元素的border和margin。</p>
+                <p>scrollTop可以被修改，通过设置scrollTop的值可以编程方式滚动元素。</p>
+                
+                <p style="text-align: center; font-weight: bold;">--- 内容底部 ---</p>
+            </div>
+        </div>
+        
+        <div class="explanation">
+            <h3>属性解释</h3>
+            <ul>
+                <li><strong>scrollTop</strong>: 元素内容垂直滚动的像素数，可以被修改以编程方式滚动元素</li>
+                <li><strong>scrollHeight</strong>: 元素内容的总高度（只读），包括因溢出而被剪切的部分</li>
+                <li><strong>clientHeight</strong>: 元素内部的高度，包括padding但不包括border、margin和滚动条</li>
+                <li><strong>滚动百分比</strong>: 计算公式为 (scrollTop / (scrollHeight - clientHeight)) * 100</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        const scrollBox = document.getElementById('scrollBox');
+        const scrollTopElement = document.getElementById('scroll-top');
+        const scrollHeightElement = document.getElementById('scroll-height');
+        const clientHeightElement = document.getElementById('client-height');
+        const percentageElement = document.getElementById('percentage');
+        
+        // 初始化信息
+        updateScrollInfo();
+        
+        function updateScrollInfo() {
+            const scrollTop = Math.round(scrollBox.scrollTop);
+            const scrollHeight = scrollBox.scrollHeight;
+            const clientHeight = scrollBox.clientHeight;
+            
+            // 计算滚动百分比
+            const maxScroll = scrollHeight - clientHeight;
+            const percentage = maxScroll > 0 ? Math.round((scrollTop / maxScroll) * 100) : 0;
+            
+            // 更新显示
+            scrollTopElement.textContent = scrollTop;
+            scrollHeightElement.textContent = scrollHeight;
+            clientHeightElement.textContent = clientHeight;
+            percentageElement.textContent = `${percentage}%`;
+        }
+        
+        function scrollToTop() {
+            scrollBox.scrollTop = 0;
+            updateScrollInfo();
+        }
+        
+        function scrollToMiddle() {
+            scrollBox.scrollTop = (scrollBox.scrollHeight - scrollBox.clientHeight) / 2;
+            updateScrollInfo();
+        }
+        
+        function scrollToBottom() {
+            scrollBox.scrollTop = scrollBox.scrollHeight - scrollBox.clientHeight;
+            updateScrollInfo();
+        }
+        
+        // 监听滚动事件
+        scrollBox.addEventListener('scroll', updateScrollInfo);
+    </script>
+</body>
+</html>

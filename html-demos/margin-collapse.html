@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Margin Collapse 示例及解决方案</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            line-height: 1.6;
+        }
+
+        h1, h2 {
+            color: #333;
+        }
+
+        .example-container {
+            margin-bottom: 40px;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+
+        /* 基本 margin collapse 示例 */
+        .basic-example .box {
+            width: 300px;
+            background-color: #f0f8ff;
+            border: 1px solid #4682b4;
+        }
+
+        .basic-example .box-one {
+            height: 100px;
+            margin-bottom: 30px;
+        }
+
+        .basic-example .box-two {
+            height: 100px;
+            margin-top: 20px;
+        }
+
+        .basic-example .parent {
+            width: 350px;
+            background-color: #ffe4e1;
+            border: 1px solid #cd5c5c;
+        }
+
+        .basic-example .child {
+            height: 50px;
+            margin-top: 30px;
+            margin-bottom: 30px;
+            background-color: #fff0f5;
+            border: 1px solid #db7093;
+        }
+
+        /* 解决方案1: 使用padding代替margin */
+        .solution-padding .box {
+            width: 300px;
+            background-color: #f0f8ff;
+            border: 1px solid #4682b4;
+        }
+
+        .solution-padding .spacer {
+            height: 30px;
+            background-color: transparent;
+        }
+
+        .solution-padding .box-two {
+            margin-top: 20px;
+        }
+
+        /* 解决方案2: 使用border */
+        .solution-border .box {
+            width: 300px;
+            background-color: #f0f8ff;
+            border: 1px solid #4682b4;
+        }
+
+        .solution-border .box-one {
+            height: 100px;
+            margin-bottom: 30px;
+            border-bottom: 1px solid transparent;
+        }
+
+        .solution-border .box-two {
+            height: 100px;
+            margin-top: 20px;
+            border-top: 1px solid transparent;
+        }
+
+        /* 解决方案3: 使用display: flex */
+        .solution-flex {
+            display: flex;
+            flex-direction: column;
+            width: 350px;
+            background-color: #ffe4e1;
+            border: 1px solid #cd5c5c;
+        }
+
+        .solution-flex .child {
+            height: 50px;
+            margin-top: 30px;
+            margin-bottom: 30px;
+            background-color: #fff0f5;
+            border: 1px solid #db7093;
+        }
+
+        /* 解决方案4: 使用display: grid */
+        .solution-grid {
+            display: grid;
+            grid-template-rows: max-content max-content;
+            width: 350px;
+            background-color: #ffe4e1;
+            border: 1px solid #cd5c5c;
+        }
+
+        .solution-grid .child {
+            height: 50px;
+            margin-top: 30px;
+            margin-bottom: 30px;
+            background-color: #fff0f5;
+            border: 1px solid #db7093;
+        }
+
+        /* 解决方案5: 使用BFC */
+        .solution-bfc .parent {
+            width: 350px;
+            background-color: #ffe4e1;
+            border: 1px solid #cd5c5c;
+            overflow: hidden; /* 创建BFC */
+        }
+
+        .solution-bfc .child {
+            height: 50px;
+            margin-top: 30px;
+            margin-bottom: 30px;
+            background-color: #fff0f5;
+            border: 1px solid #db7093;
+        }
+
+        /* 解决方案6: 使用绝对定位 */
+        .solution-position {
+            position: relative;
+            width: 350px;
+            height: 200px;
+            background-color: #ffe4e1;
+            border: 1px solid #cd5c5c;
+        }
+
+        .solution-position .child-one {
+            position: absolute;
+            top: 20px;
+            height: 50px;
+            width: 100%;
+            background-color: #fff0f5;
+            border: 1px solid #db7093;
+        }
+
+        .solution-position .child-two {
+            position: absolute;
+            top: 100px;
+            height: 50px;
+            width: 100%;
+            background-color: #fff0f5;
+            border: 1px solid #db7093;
+        }
+
+        /* 解决方案7: 使用transform */
+        .solution-transform .box {
+            width: 300px;
+            background-color: #f0f8ff;
+            border: 1px solid #4682b4;
+        }
+
+        .solution-transform .box-one {
+            height: 100px;
+            margin-bottom: 30px;
+        }
+
+        .solution-transform .box-two {
+            height: 100px;
+            margin-top: 20px;
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body>
+    <h1>Margin Collapse 示例及解决方案</h1>
+
+    <div class="example-container basic-example">
+        <h2>1. 基本的 Margin Collapse 现象</h2>
+        <p>垂直方向上相邻元素的 margin 会发生合并，取较大值。</p>
+        
+        <div class="box box-one">Box One (margin-bottom: 30px)</div>
+        <div class="box box-two">Box Two (margin-top: 20px)</div>
+        
+        <p>实际间距是 30px（取较大值），而不是 50px。</p>
+        
+        <h3>父子元素的 Margin Collapse</h3>
+        <div class="parent">
+            Parent Element
+            <div class="child">Child Element (margin-top: 30px; margin-bottom: 30px)</div>
+            这个子元素的 margin 会与父元素发生合并
+        </div>
+    </div>
+
+    <div class="example-container solution-padding">
+        <h2>2. 解决方案一：使用 Padding 代替 Margin</h2>
+        <p>使用 padding 或添加空元素代替 margin。</p>
+        
+        <div class="box box-one">Box One</div>
+        <div class="spacer"></div>
+        <div class="box box-two">Box Two</div>
+    </div>
+
+    <div class="example-container solution-border">
+        <h2>3. 解决方案二：添加边框</h2>
+        <p>给元素添加透明边框可以阻止 margin collapse。</p>
+        
+        <div class="box box-one">Box One (添加了透明边框)</div>
+        <div class="box box-two">Box Two (添加了透明边框)</div>
+    </div>
+
+    <div class="example-container solution-flex">
+        <h2>4. 解决方案三：使用 Flexbox</h2>
+        <p>Flex 容器中的元素不会发生 margin collapse。</p>
+        
+        <div class="solution-flex">
+            <div class="child">Child Element</div>
+            <div class="child">Child Element</div>
+        </div>
+    </div>
+
+    <div class="example-container solution-grid">
+        <h2>5. 解决方案四：使用 Grid</h2>
+        <p>Grid 布局也可以避免 margin collapse。</p>
+        
+        <div class="solution-grid">
+            <div class="child">Child Element</div>
+            <div class="child">Child Element</div>
+        </div>
+    </div>
+
+    <div class="example-container solution-bfc">
+        <h2>6. 解决方案五：创建 BFC (Block Formatting Context)</h2>
+        <p>通过创建 BFC 可以阻止 margin collapse。</p>
+        
+        <div class="solution-bfc">
+            <div class="parent">
+                Parent Element (创建了 BFC)
+                <div class="child">Child Element</div>
+                现在子元素的 margin 不会与父元素发生合并
+            </div>
+        </div>
+    </div>
+
+    <div class="example-container solution-position">
+        <h2>7. 解决方案六：使用定位</h2>
+        <p>脱离文档流的元素不会发生 margin collapse。</p>
+        
+        <div class="solution-position">
+            <div class="child-one">Child One (绝对定位)</div>
+            <div class="child-two">Child Two (绝对定位)</div>
+        </div>
+    </div>
+
+    <div class="example-container solution-transform">
+        <h2>8. 解决方案七：使用 Transform</h2>
+        <p>应用 transform 可以创建新的包含块，防止 margin collapse。</p>
+        
+        <div class="box box-one">Box One</div>
+        <div class="box box-two">Box Two (应用了 transform)</div>
+    </div>
+</body>
+</html>

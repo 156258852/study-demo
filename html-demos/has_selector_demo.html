@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CSS :has() 选择器应用演示</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+        }
+
+        h1, h2 {
+            color: #333;
+        }
+
+        .demo-container {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            background-color: #f9f9f9;
+        }
+
+        /* :has() 选择器示例 */
+        /* 选择包含img元素的div */
+        .container:has(img) {
+            border: 2px solid #4CAF50;
+            background-color: #e8f5e9;
+        }
+
+        /* 选择包含.hover类的容器 */
+        .card:has(.hover) {
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            transform: translateY(-5px);
+            transition: all 0.3s ease;
+        }
+
+        /* 选择包含空元素的列表项 */
+        li:has(:empty) {
+            background-color: #ffcdd2;
+            border: 1px dashed #f44336;
+        }
+
+        /* 选择包含链接的段落 */
+        p:has(a) {
+            background-color: #e3f2fd;
+            padding: 10px;
+            border-left: 4px solid #2196F3;
+        }
+
+        /* 选择包含必填输入框的表单 */
+        form:has(input:required:placeholder-shown) {
+            border: 2px solid #ff9800;
+        }
+
+        form:has(input:required:not(:placeholder-shown):valid) {
+            border: 2px solid #4CAF50;
+        }
+
+        form:has(input:required:not(:placeholder-shown):invalid) {
+            border: 2px solid #f44336;
+        }
+
+        /* 选择包含悬停元素的卡片 */
+        .product-card:has(:hover) {
+            background-color: #fff3e0;
+        }
+
+        /* 选择包含复选框选中状态的列表项 */
+        li:has(input[type="checkbox"]:checked) {
+            text-decoration: line-through;
+            color: #999;
+        }
+
+        /* 选择包含特定属性的元素的容器 */
+        .section:has([data-highlight]) {
+            background-color: #fff8e1;
+            border: 2px solid #ffc107;
+        }
+
+        /* 其他样式 */
+        img {
+            max-width: 100%;
+            height: auto;
+        }
+
+        .card {
+            background: white;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 10px 0;
+            transition: all 0.3s ease;
+        }
+
+        .hover {
+            background-color: #ffeb3b;
+            padding: 5px;
+            border-radius: 4px;
+        }
+
+        input, textarea {
+            padding: 8px;
+            margin: 5px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        input:valid {
+            border-color: #4CAF50;
+        }
+
+        input:invalid {
+            border-color: #f44336;
+        }
+
+        .product-card {
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 10px 0;
+        }
+
+        .product-card h3 {
+            margin-top: 0;
+        }
+
+        ul {
+            padding-left: 20px;
+        }
+
+        li {
+            margin: 10px 0;
+            padding: 5px;
+        }
+
+        button {
+            background-color: #2196F3;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #1976D2;
+        }
+    </style>
+</head>
+<body>
+    <h1>CSS <code>:has()</code> 选择器应用演示</h1>
+    <p><code>:has()</code> 选择器是一个强大的CSS选择器，它允许我们根据元素内部的内容来选择元素。这为样式设计提供了更多可能性。</p>
+
+    <div class="demo-container">
+        <h2>1. 选择包含图片的容器</h2>
+        <p>当容器包含图片时，会显示绿色边框：</p>
+        
+        <div class="container">
+            <p>这个容器没有图片</p>
+        </div>
+        
+        <div class="container">
+            <p>这个容器有图片：</p>
+            <img src="https://via.placeholder.com/150" alt="示例图片">
+        </div>
+    </div>
+
+    <div class="demo-container">
+        <h2>2. 卡片悬停效果</h2>
+        <p>当鼠标悬停在卡片内的元素上时，整个卡片会提升：</p>
+        
+        <div class="card">
+            <p>将鼠标悬停在<span class="hover">这个元素</span>上看看效果</p>
+        </div>
+        
+        <div class="card">
+            <p>这个卡片没有可悬停的元素</p>
+        </div>
+    </div>
+
+    <div class="demo-container">
+        <h2>3. 任务列表</h2>
+        <p>空任务项会以红色背景显示，已完成的任务会显示删除线：</p>
+        
+        <ul>
+            <li>已完成任务<input type="checkbox" checked></li>
+            <li>进行中任务<input type="checkbox"></li>
+            <li></li> <!-- 空任务项 -->
+        </ul>
+    </div>
+
+    <div class="demo-container">
+        <h2>4. 包含链接的段落</h2>
+        <p>包含链接的段落会有特殊样式：</p>
+        
+        <p>这是一个普通段落，没有链接。</p>
+        
+        <p>这是一个包含<a href="#">链接</a>的段落，它会有特殊样式。</p>
+    </div>
+
+    <div class="demo-container">
+        <h2>5. 表单验证样式</h2>
+        <p>根据表单内容的状态改变边框颜色：</p>
+        
+        <form>
+            <label for="name">姓名（必填）:</label>
+            <input type="text" id="name" name="name" required placeholder="请输入姓名">
+            
+            <label for="email">邮箱（必填）:</label>
+            <input type="email" id="email" name="email" required placeholder="请输入邮箱">
+            
+            <button type="submit">提交</button>
+        </form>
+    </div>
+
+    <div class="demo-container">
+        <h2>6. 产品卡片</h2>
+        <p>当鼠标悬停在产品卡片内的任何元素上时，卡片背景会改变：</p>
+        
+        <div class="product-card">
+            <h3>产品名称</h3>
+            <p>产品描述信息...</p>
+            <button>查看详情</button>
+        </div>
+    </div>
+
+    <div class="demo-container">
+        <h2>7. 高亮区域</h2>
+        <p>包含特定属性的区域会被高亮显示：</p>
+        
+        <div class="section">
+            <p>普通区域</p>
+        </div>
+        
+        <div class="section">
+            <p data-highlight>这个区域包含data-highlight属性，会被高亮显示</p>
+        </div>
+    </div>
+
+    <h2>浏览器支持说明</h2>
+    <p><code>:has()</code> 选择器是一个相对较新的CSS特性，可能不被所有浏览器支持。在生产环境中使用时，请检查目标浏览器的兼容性。</p>
+</body>
+</html>

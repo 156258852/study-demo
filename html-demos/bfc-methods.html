@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BFC 创建方法</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            line-height: 1.6;
+            background-color: #f5f5f5;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .example {
+            background-color: white;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            margin-bottom: 30px;
+            padding: 20px;
+        }
+
+        h2 {
+            color: #444;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 10px;
+        }
+
+        .demo-area {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px dashed #ccc;
+            background-color: #fafafa;
+        }
+
+        /* BFC 创建方法示例样式 */
+        .float-container {
+            width: 100%;
+            background-color: #e6f3ff;
+            padding: 10px;
+        }
+
+        .float-box {
+            float: left;
+            width: 100px;
+            height: 100px;
+            background-color: #4CAF50;
+            margin: 10px;
+        }
+
+        .bfc-element {
+            background-color: #ffeb3b;
+            height: 50px;
+            margin: 20px;
+        }
+
+        .clearfix::after {
+            content: "";
+            display: table;
+            clear: both;
+        }
+
+        .overflow-visible {
+            overflow: visible;
+            background-color: #e6f3ff;
+        }
+
+        .overflow-hidden {
+            overflow: hidden;
+            background-color: #e6f3ff;
+        }
+
+        .overflow-auto {
+            overflow: auto;
+            background-color: #e6f3ff;
+        }
+
+        .overflow-scroll {
+            overflow: scroll;
+            background-color: #e6f3ff;
+        }
+
+        .inline-block-container {
+            background-color: #e6f3ff;
+        }
+
+        .inline-block-element {
+            display: inline-block;
+            width: 200px;
+            height: 100px;
+            background-color: #ff9800;
+            margin: 20px;
+        }
+
+        .table-container {
+            display: table;
+            width: 100%;
+            background-color: #e6f3ff;
+        }
+
+        .table-cell-element {
+            display: table-cell;
+            height: 100px;
+            background-color: #9c27b0;
+            width: 33%;
+            color: white;
+            text-align: center;
+            vertical-align: middle;
+        }
+
+        .flex-container {
+            display: flex;
+            background-color: #e6f3ff;
+        }
+
+        .flex-item {
+            flex: 1;
+            height: 100px;
+            background-color: #3f51b5;
+            margin: 10px;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .grid-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 10px;
+            background-color: #e6f3ff;
+        }
+
+        .grid-item {
+            height: 100px;
+            background-color: #e91e63;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .absolute-element {
+            position: absolute;
+            width: 200px;
+            height: 100px;
+            background-color: #009688;
+            margin: 20px;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .relative-container {
+            position: relative;
+            height: 150px;
+            border: 2px solid #009688;
+        }
+
+        .contain-layout {
+            contain: layout;
+            background-color: #e6f3ff;
+            padding: 20px;
+        }
+
+        .contain-paint {
+            contain: paint;
+            background-color: #e6f3ff;
+            padding: 20px;
+        }
+
+        .contain-strict {
+            contain: strict;
+            background-color: #e6f3ff;
+            padding: 20px;
+        }
+
+        .column-container {
+            column-count: 3;
+            column-gap: 20px;
+            background-color: #e6f3ff;
+            padding: 20px;
+        }
+
+        .column-box {
+            height: 80px;
+            background-color: #ff5722;
+            margin: 10px 0;
+            break-inside: avoid;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>BFC (Block Formatting Context) 创建方法</h1>
+        
+        <div class="example">
+            <h2>什么是 BFC？</h2>
+            <p>BFC（Block Formatting Context）是 Web 页面的可视化 CSS 渲染的一部分，是块级盒子的布局过程发生的区域，也是浮动元素与其他元素交互的区域。创建 BFC 可以解决以下问题：</p>
+            <ul>
+                <li>防止 margin collapse（外边距合并）</li>
+                <li>清除浮动</li>
+                <li>防止文字环绕浮动元素</li>
+            </ul>
+        </div>
+
+        <div class="example">
+            <h2>1. float 不为 none</h2>
+            <p>当元素的 float 属性不为 none 时，会创建 BFC。</p>
+            <div class="demo-area">
+                <div class="float-container clearfix">
+                    <div class="float-box"></div>
+                    <div class="bfc-element">这个元素在浮动元素旁边，但它在自己的 BFC 中</div>
+                </div>
+            </div>
+            <pre><code>
+.float-container {
+    overflow: hidden; /* 或者 overflow: auto 等 */
+}
+
+.float-box {
+    float: left;
+}
+
+.bfc-element {
+    /* float: left/right 会创建 BFC */
+    float: right;
+}
+            </code></pre>
+        </div>
+
+        <div class="example">
+            <h2>2. overflow 不为 visible</h2>
+            <p>当 overflow 设置为 hidden、auto 或 scroll 时，会创建 BFC。</p>
+            
+            <h3>overflow: visible（不创建 BFC）</h3>
+            <div class="demo-area">
+                <div class="overflow-visible">
+                    <div class="float-box"></div>
+                    <div>背景没有包含浮动元素，因为没有创建 BFC</div>
+                </div>
+            </div>
+            
+            <h3>overflow: hidden（创建 BFC）</h3>
+            <div class="demo-area">
+                <div class="overflow-hidden">
+                    <div class="float-box"></div>
+                    <div>背景包含了浮动元素，因为创建了 BFC</div>
+                </div>
+            </div>
+            
+            <h3>overflow: auto（创建 BFC）</h3>
+            <div class="demo-area">
+                <div class="overflow-auto">
+                    <div class="float-box"></div>
+                    <div>背景包含了浮动元素，因为创建了 BFC</div>
+                </div>
+            </div>
+            
+            <h3>overflow: scroll（创建 BFC）</h3>
+            <div class="demo-area">
+                <div class="overflow-scroll">
+                    <div class="float-box"></div>
+                    <div>背景包含了浮动元素，因为创建了 BFC</div>
+                </div>
+            </div>
+            
+            <pre><code>
+.container {
+    overflow: hidden; /* auto, scroll 也可以 */
+}
+            </code></pre>
+        </div>
+
+        <div class="example">
+            <h2>3. display 为 inline-block</h2>
+            <p>设置元素的 display 属性为 inline-block 会创建 BFC。</p>
+            <div class="demo-area">
+                <div class="inline-block-container">
+                    <div class="inline-block-element">这个元素创建了 BFC</div>
+                    <div class="inline-block-element">这个元素也创建了 BFC</div>
+                </div>
+            </div>
+            <pre><code>
+.element {
+    display: inline-block;
+}
+            </code></pre>
+        </div>
+
+        <div class="example">
+            <h2>4. display 为 table-cell 或 table-caption</h2>
+            <p>设置元素的 display 属性为 table-cell 或 table-caption 会创建 BFC。</p>
+            <div class="demo-area">
+                <div class="table-container">
+                    <div class="table-cell-element">Table Cell 1</div>
+                    <div class="table-cell-element">Table Cell 2</div>
+                    <div class="table-cell-element">Table Cell 3</div>
+                </div>
+            </div>
+            <pre><code>
+.element {
+    display: table-cell;
+}
+            </code></pre>
+        </div>
+
+        <div class="example">
+            <h2>5. display 为 flex</h2>
+            <p>Flex 容器会为直接子元素创建 BFC。</p>
+            <div class="demo-area">
+                <div class="flex-container">
+                    <div class="flex-item">Flex Item 1</div>
+                    <div class="flex-item">Flex Item 2</div>
+                    <div class="flex-item">Flex Item 3</div>
+                </div>
+            </div>
+            <pre><code>
+.container {
+    display: flex;
+}
+            </code></pre>
+        </div>
+
+        <div class="example">
+            <h2>6. display 为 grid</h2>
+            <p>Grid 容器会为直接子元素创建 BFC。</p>
+            <div class="demo-area">
+                <div class="grid-container">
+                    <div class="grid-item">Grid Item 1</div>
+                    <div class="grid-item">Grid Item 2</div>
+                    <div class="grid-item">Grid Item 3</div>
+                </div>
+            </div>
+            <pre><code>
+.container {
+    display: grid;
+}
+            </code></pre>
+        </div>
+
+        <div class="example">
+            <h2>7. position 不为 static 或 relative</h2>
+            <p>当 position 设置为 absolute 或 fixed 时，会创建 BFC。</p>
+            <div class="demo-area">
+                <div class="relative-container">
+                    <div class="absolute-element">绝对定位元素创建了 BFC</div>
+                </div>
+            </div>
+            <pre><code>
+.element {
+    position: absolute; /* 或 fixed */
+}
+            </code></pre>
+        </div>
+
+        <div class="example">
+            <h2>8. contain 为 layout、content 或 paint</h2>
+            <p>CSS Containment 属性也可以创建 BFC。</p>
+            
+            <h3>contain: layout</h3>
+            <div class="demo-area">
+                <div class="contain-layout">
+                    这个元素通过 contain: layout 创建了 BFC
+                </div>
+            </div>
+            
+            <h3>contain: paint</h3>
+            <div class="demo-area">
+                <div class="contain-paint">
+                    这个元素通过 contain: paint 创建了 BFC
+                </div>
+            </div>
+            
+            <h3>contain: strict</h3>
+            <div class="demo-area">
+                <div class="contain-strict">
+                    这个元素通过 contain: strict 创建了 BFC
+                </div>
+            </div>
+            
+            <pre><code>
+.element {
+    contain: layout; /* 或 paint, strict */
+}
+            </code></pre>
+        </div>
+
+        <div class="example">
+            <h2>9. column-count 或 column-width 不为 auto</h2>
+            <p>多列布局也会创建 BFC。</p>
+            <div class="demo-area">
+                <div class="column-container">
+                    <div class="column-box">Column 1</div>
+                    <div class="column-box">Column 2</div>
+                    <div class="column-box">Column 3</div>
+                    <div class="column-box">Column 4</div>
+                    <div class="column-box">Column 5</div>
+                    <div class="column-box">Column 6</div>
+                </div>
+            </div>
+            <pre><code>
+.container {
+    column-count: 3; /* 或设置 column-width */
+}
+            </code></pre>
+        </div>
+
+        <div class="example">
+            <h2>总结</h2>
+            <p>创建 BFC 的主要方法包括：</p>
+            <ol>
+                <li><code>float</code> 不为 <code>none</code></li>
+                <li><code>overflow</code> 不为 <code>visible</code></li>
+                <li><code>display</code> 为 <code>inline-block</code>、<code>table-cell</code>、<code>table-caption</code>、<code>flex</code>、<code>grid</code></li>
+                <li><code>position</code> 不为 <code>static</code> 或 <code>relative</code></li>
+                <li><code>contain</code> 为 <code>layout</code>、<code>content</code> 或 <code>paint</code></li>
+                <li><code>column-count</code> 或 <code>column-width</code> 不为 <code>auto</code></li>
+            </ol>
+            <p>在实际开发中，最常用的方法是使用 <code>overflow: hidden</code> 或现代布局方法如 Flexbox 和 Grid。</p>
+        </div>
+    </div>
+</body>
+</html>
