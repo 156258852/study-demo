@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dexie.js IndexedDB 示例</title>
+    <script src="https://unpkg.com/dexie@3.2.3/dist/dexie.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .container {
+            margin-bottom: 30px;
+        }
+        h1, h2 {
+            color: #333;
+        }
+        button {
+            background-color: #4CAF50;
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 4px 2px;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        input, textarea {
+            width: 100%;
+            padding: 12px 20px;
+            margin: 8px 0;
+            box-sizing: border-box;
+            border: 2px solid #ccc;
+            border-radius: 4px;
+        }
+        .log {
+            background-color: #f8f8f8;
+            border: 1px solid #ddd;
+            padding: 10px;
+            height: 200px;
+            overflow-y: scroll;
+            margin-top: 10px;
+            border-radius: 4px;
+        }
+        .record {
+            padding: 5px;
+            border-bottom: 1px solid #eee;
+        }
+        .comparison {
+            display: flex;
+            margin-top: 30px;
+        }
+        .comparison > div {
+            flex: 1;
+            padding: 15px;
+            border: 1px solid #ccc;
+            margin: 0 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Dexie.js IndexedDB 示例</h1>
+    <p>Dexie.js 是一个轻量级、简洁的 IndexedDB 封装库，大大简化了 IndexedDB 的使用。</p>
+    
+    <div class="container">
+        <h2>数据库操作</h2>
+        <button id="initDB">初始化数据库</button>
+        <button id="deleteDB">删除数据库</button>
+    </div>
+
+    <div class="container">
+        <h2>添加数据</h2>
+        <input type="text" id="userName" placeholder="用户名">
+        <input type="email" id="userEmail" placeholder="邮箱">
+        <button id="addUser">添加用户</button>
+    </div>
+
+    <div class="container">
+        <h2>查询数据</h2>
+        <button id="getAllUsers">获取所有用户</button>
+        <input type="text" id="searchId" placeholder="根据ID查询用户">
+        <button id="getUserById">根据ID查询</button>
+        <input type="text" id="searchName" placeholder="根据姓名查询用户">
+        <button id="getUserByName">根据姓名查询</button>
+    </div>
+
+    <div class="container">
+        <h2>更新数据</h2>
+        <input type="text" id="updateId" placeholder="用户ID">
+        <input type="text" id="updateName" placeholder="新用户名">
+        <input type="email" id="updateEmail" placeholder="新邮箱">
+        <button id="updateUser">更新用户</button>
+    </div>
+
+    <div class="container">
+        <h2>删除数据</h2>
+        <input type="text" id="deleteId" placeholder="要删除的用户ID">
+        <button id="deleteUser">删除用户</button>
+    </div>
+
+    <div class="container">
+        <h2>日志输出</h2>
+        <div id="log" class="log"></div>
+    </div>
+
+    <div class="comparison">
+        <div>
+            <h3>原生 IndexedDB</h3>
+            <p>需要大量样板代码</p>
+            <pre>
+const request = indexedDB.open('MyDB', 1);
+request.onsuccess = function(event) {
+  const db = event.target.result;
+  const transaction = db.transaction(['users'], 'readwrite');
+  const objectStore = transaction.objectStore('users');
+  const addRequest = objectStore.add({name: 'John', email: 'john@example.com'});
+  addRequest.onsuccess = function() {
+    console.log('添加成功');
+  };
+};
+            </pre>
+        </div>
+        <div>
+            <h3>使用 Dexie.js</h3>
+            <p>简洁明了的语法</p>
+            <pre>
+const db = new Dexie('MyDB');
+db.version(1).stores({ users: '++id,name,email' });
+
+// 添加数据
+await db.users.add({name: 'John', email: 'john@example.com'});
+
+// 查询数据
+const users = await db.users.toArray();
+            </pre>
+        </div>
+    </div>
+
+    <script>
+        // 初始化 Dexie 数据库
+        let db;
+
+        // DOM 元素
+        const logElement = document.getElementById('log');
+
+        // 日志函数
+        function log(message) {
+            const time = new Date().toLocaleTimeString();
+            const record = document.createElement('div');
+            record.className = 'record';
+            record.textContent = `[${time}] ${message}`;
+            logElement.appendChild(record);
+            logElement.scrollTop = logElement.scrollHeight;
+        }
+
+        // 错误处理函数
+        function handleError(error) {
+            log('错误: ' + error.message);
+            console.error(error);
+        }
+
+        // 初始化数据库
+        document.getElementById('initDB').addEventListener('click', async () => {
+            try {
+                // 创建 Dexie 实例
+                db = new Dexie('UserDatabaseDexie');
+                
+                // 定义数据库版本和结构
+                db.version(1).stores({
+                    users: '++id,name,email',  // ++id 表示自增主键，name 和 email 是索引，
+                    posts: '++id,title,content'
+                });
+                
+                log('数据库初始化成功');
+                log(`数据库名称: ${db.name}`);
+            } catch (error) {
+                handleError(error);
+            }
+        });
+
+        // 删除数据库
+        document.getElementById('deleteDB').addEventListener('click', async () => {
+            try {
+                if (db) {
+                    await db.delete();
+                    db = null;
+                    log('数据库删除成功');
+                } else {
+                    // 即使没有初始化 db 实例，也可以通过 Dexie.delete 删除数据库
+                    await Dexie.delete('UserDatabaseDexie');
+                    log('数据库删除成功');
+                }
+            } catch (error) {
+                handleError(error);
+            }
+        });
+
+        // 添加用户
+        document.getElementById('addUser').addEventListener('click', async () => {
+            if (!db) {
+                log('请先初始化数据库');
+                return;
+            }
+            
+            const name = document.getElementById('userName').value;
+            const email = document.getElementById('userEmail').value;
+            
+            if (!name || !email) {
+                log('请填写完整信息');
+                return;
+            }
+            
+            try {
+                const id = await db.users.add({ name, email });
+                log(`用户添加成功，ID: ${id}`);
+                // 清空输入框
+                document.getElementById('userName').value = '';
+                document.getElementById('userEmail').value = '';
+            } catch (error) {
+                handleError(error);
+            }
+        });
+
+        // 获取所有用户
+        document.getElementById('getAllUsers').addEventListener('click', async () => {
+            if (!db) {
+                log('请先初始化数据库');
+                return;
+            }
+            
+            try {
+                const users = await db.users.toArray();
+                if (users.length === 0) {
+                    log('暂无用户数据');
+                } else {
+                    log(`获取到 ${users.length} 个用户:`);
+                    users.forEach(user => {
+                        log(`ID: ${user.id}, 姓名: ${user.name}, 邮箱: ${user.email}`);
+                    });
+                }
+            } catch (error) {
+                handleError(error);
+            }
+        });
+
+        // 根据ID获取用户
+        document.getElementById('getUserById').addEventListener('click', async () => {
+            if (!db) {
+                log('请先初始化数据库');
+                return;
+            }
+            
+            const id = parseInt(document.getElementById('searchId').value);
+            if (!id) {
+                log('请输入有效的用户ID');
+                return;
+            }
+            
+            try {
+                const user = await db.users.get(id);
+                if (user) {
+                    log(`找到用户: ID: ${user.id}, 姓名: ${user.name}, 邮箱: ${user.email}`);
+                } else {
+                    log('未找到指定用户');
+                }
+            } catch (error) {
+                handleError(error);
+            }
+        });
+
+        // 根据姓名获取用户
+        document.getElementById('getUserByName').addEventListener('click', async () => {
+            if (!db) {
+                log('请先初始化数据库');
+                return;
+            }
+            
+            const name = document.getElementById('searchName').value;
+            if (!name) {
+                log('请输入用户名');
+                return;
+            }
+            
+            try {
+                // 使用索引查询
+                const users = await db.users.where('name').equals(name).toArray();
+                if (users.length === 0) {
+                    log('未找到匹配的用户');
+                } else {
+                    log(`找到 ${users.length} 个用户:`);
+                    users.forEach(user => {
+                        log(`ID: ${user.id}, 姓名: ${user.name}, 邮箱: ${user.email}`);
+                    });
+                }
+            } catch (error) {
+                handleError(error);
+            }
+        });
+
+        // 更新用户
+        document.getElementById('updateUser').addEventListener('click', async () => {
+            if (!db) {
+                log('请先初始化数据库');
+                return;
+            }
+            
+            const id = parseInt(document.getElementById('updateId').value);
+            const name = document.getElementById('updateName').value;
+            const email = document.getElementById('updateEmail').value;
+            
+            if (!id) {
+                log('请输入有效的用户ID');
+                return;
+            }
+            
+            if (!name && !email) {
+                log('请至少填写一个要更新的字段');
+                return;
+            }
+            
+            try {
+                // 查找现有用户
+                const user = await db.users.get(id);
+                if (!user) {
+                    log('未找到指定用户');
+                    return;
+                }
+                
+                // 更新字段
+                if (name) user.name = name;
+                if (email) user.email = email;
+                
+                // 保存更新
+                await db.users.put(user);
+                log('用户更新成功');
+                
+                // 清空输入框
+                document.getElementById('updateId').value = '';
+                document.getElementById('updateName').value = '';
+                document.getElementById('updateEmail').value = '';
+            } catch (error) {
+                handleError(error);
+            }
+        });
+
+        // 删除用户
+        document.getElementById('deleteUser').addEventListener('click', async () => {
+            if (!db) {
+                log('请先初始化数据库');
+                return;
+            }
+            
+            const id = parseInt(document.getElementById('deleteId').value);
+            if (!id) {
+                log('请输入有效的用户ID');
+                return;
+            }
+            
+            try {
+                await db.users.delete(id);
+                log('用户删除成功');
+                // 清空输入框
+                document.getElementById('deleteId').value = '';
+            } catch (error) {
+                handleError(error);
+            }
+        });
+
+        // 页面加载完成后的初始化
+        window.addEventListener('load', () => {
+            log('Dexie.js 示例已加载');
+            log('请先点击"初始化数据库"按钮开始');
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JavaScript Generator 函数演示</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+        .demo-section {
+            margin-bottom: 30px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+        .output {
+            background-color: #f9f9f9;
+            border: 1px solid #eee;
+            padding: 10px;
+            margin-top: 10px;
+            min-height: 50px;
+            border-radius: 4px;
+            white-space: pre-wrap;
+        }
+        .fibonacci-controls {
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>JavaScript Generator 函数演示</h1>
+        
+        <!-- 基础 Generator 示例 -->
+        <div class="demo-section">
+            <h2>基础 Generator 示例</h2>
+            <p>这是一个简单的 Generator 函数，逐步产生数值。</p>
+            <button id="runSimpleGenerator">运行 Simple Generator</button>
+            <div id="simpleGeneratorOutput" class="output"></div>
+        </div>
+        
+        <!-- 带参数的 Generator 示例 -->
+        <div class="demo-section">
+            <h2>带参数的 Generator 示例</h2>
+            <p>这个 Generator 函数可以接收传入的参数。</p>
+            <button id="runParamGenerator">运行 Parameter Generator</button>
+            <div id="paramGeneratorOutput" class="output"></div>
+        </div>
+        
+        <!-- 斐波那契数列 Generator 示例 -->
+        <div class="demo-section">
+            <h2>斐波那契数列 Generator 示例</h2>
+            <p>使用 Generator 生成斐波那契数列。</p>
+            <div class="fibonacci-controls">
+                <button id="startFibonacci">开始生成</button>
+                <button id="nextFibonacci" disabled>下一个数</button>
+                <button id="resetFibonacci">重置</button>
+            </div>
+            <div id="fibonacciOutput" class="output"></div>
+        </div>
+        
+        <!-- 对象遍历 Generator 示例 -->
+        <div class="demo-section">
+            <h2>对象遍历 Generator 示例</h2>
+            <p>使用 Generator 遍历对象的属性。</p>
+            <button id="runObjectGenerator">运行 Object Property Generator</button>
+            <div id="objectGeneratorOutput" class="output"></div>
+        </div>
+    </div>
+
+    <script>
+        // 基础 Generator 函数
+        function* simpleGenerator() {
+            yield 1;
+            yield 2;
+            yield 3;
+        }
+
+        // 带参数的 Generator 函数
+        function* generatorWithParams() {
+            const value1 = yield '第一步';
+            console.log('接收到 value1:', value1);
+            
+            const value2 = yield '第二步';
+            console.log('接收到 value2:', value2);
+            
+            return '完成';
+        }
+
+        // 斐波那契数列 Generator
+        function* fibonacciGenerator() {
+            let prev = 0;
+            let curr = 1;
+            
+            yield prev;
+            yield curr;
+            
+            while (true) {
+                const next = prev + curr;
+                yield next;
+                prev = curr;
+                curr = next;
+            }
+        }
+
+        // 对象属性遍历 Generator
+        function* objectPropertyGenerator(obj) {
+            const keys = Object.keys(obj);
+            for (let key of keys) {
+                yield [key, obj[key]];
+            }
+        }
+
+        // DOM 元素
+        const simpleGeneratorOutput = document.getElementById('simpleGeneratorOutput');
+        const paramGeneratorOutput = document.getElementById('paramGeneratorOutput');
+        const fibonacciOutput = document.getElementById('fibonacciOutput');
+        const objectGeneratorOutput = document.getElementById('objectGeneratorOutput');
+        
+        const runSimpleGeneratorBtn = document.getElementById('runSimpleGenerator');
+        const runParamGeneratorBtn = document.getElementById('runParamGenerator');
+        const runObjectGeneratorBtn = document.getElementById('runObjectGenerator');
+        
+        const startFibonacciBtn = document.getElementById('startFibonacci');
+        const nextFibonacciBtn = document.getElementById('nextFibonacci');
+        const resetFibonacciBtn = document.getElementById('resetFibonacci');
+
+        // 简单 Generator 示例
+        runSimpleGeneratorBtn.addEventListener('click', () => {
+            simpleGeneratorOutput.innerHTML = '';
+            const gen = simpleGenerator();
+            
+            let result = gen.next();
+            while (!result.done) {
+                simpleGeneratorOutput.innerHTML += `值: ${result.value}\n`;
+                result = gen.next();
+            }
+        });
+
+        // 带参数的 Generator 示例
+        runParamGeneratorBtn.addEventListener('click', () => {
+            paramGeneratorOutput.innerHTML = '';
+            const gen = generatorWithParams();
+            
+            let result = gen.next();
+            paramGeneratorOutput.innerHTML += `yield 值: ${result.value}\n`;
+            
+            result = gen.next('Hello');
+            paramGeneratorOutput.innerHTML += `yield 值: ${result.value}\n`;
+            
+            result = gen.next('World');
+            paramGeneratorOutput.innerHTML += `返回值: ${result.value}\n`;
+        });
+
+        // 斐波那契数列 Generator 示例
+        let fibGen = null;
+        
+        startFibonacciBtn.addEventListener('click', () => {
+            fibGen = fibonacciGenerator();
+            fibonacciOutput.innerHTML = '';
+            nextFibonacciBtn.disabled = false;
+            fibonacciOutput.innerHTML = '斐波那契数列:\n';
+        });
+        
+        nextFibonacciBtn.addEventListener('click', () => {
+            if (fibGen) {
+                const result = fibGen.next();
+                fibonacciOutput.innerHTML += `${result.value} `;
+            }
+        });
+        
+        resetFibonacciBtn.addEventListener('click', () => {
+            fibGen = null;
+            nextFibonacciBtn.disabled = true;
+            fibonacciOutput.innerHTML = '';
+        });
+
+        // 对象遍历 Generator 示例
+        runObjectGeneratorBtn.addEventListener('click', () => {
+            objectGeneratorOutput.innerHTML = '';
+            const person = { 
+                name: '张三', 
+                age: 30, 
+                city: '北京',
+                occupation: '工程师'
+            };
+            
+            objectGeneratorOutput.innerHTML = '对象属性:\n';
+            for (let [key, value] of objectPropertyGenerator(person)) {
+                objectGeneratorOutput.innerHTML += `${key}: ${value}\n`;
+            }
+        });
+    </script>
+</body>
+</html>

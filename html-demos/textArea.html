@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>文本域显示行号</title>
+  <style>
+    .container {
+      display: flex;
+      border: 1px solid rgb(203 213 225);
+      overflow: hidden;
+      width: 400px;
+    }
+
+    .numbers {
+      flex: 1;
+      border-right: 1px solid rgb(203 213 225);
+      overflow: hidden;
+      text-align: center;
+      box-sizing: border-box;
+    }
+
+    .textarea {
+      width: 370px;
+      padding: 5px;
+      border: none;
+      outline: none;
+      font-size: 20px;
+      resize: vertical;
+      min-height: 10rem;
+      max-height: 20rem;
+      overflow-x: hidden;
+      box-sizing: border-box;
+    }
+
+    ::-webkit-scrollbar {
+      background: transparent;
+      height: 8px;
+      width: 8px;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      border-radius: 1;
+      background: rgb(148 163 184);
+    }
+
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <div class="numbers"></div>
+    <textarea class="textarea"></textarea>
+  </div>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const textarea = document.querySelector('.textarea');
+      const numbers = document.querySelector('.numbers');
+      function initLineNumbers() {
+        const lines = calcLines();
+        const lineDoms = Array.from({
+          length: lines.length,
+        }, (_, i) => `<div>${lines[i] || '&nbsp;'}</div>`);
+        numbers.innerHTML = lineDoms.join('');
+      }
+      const textareaStyles = window.getComputedStyle(textarea);
+      [
+        'fontFamily', 'fontSize', 'fontWeight',
+        'letterSpacing', 'lineHeight', 'padding',
+      ].forEach((property) => {
+        numbers.style[property] = textareaStyles[property];
+      });
+      const canvas = document.createElement('canvas');
+      const context = canvas.getContext('2d');
+      const font = `${textareaStyles.fontSize} ${textareaStyles.fontFamily}`;
+      context.font = font;
+      function calcStringLines(sentence, width) {
+        if (!width) return 0;
+        const words = sentence.split('');
+        let lineCount = 0;
+        let currentLine = '';
+        for (let i = 0; i < words.length; i++) {
+          const wordWidth = context.measureText(words[i]).width;
+          const lineWidth = context.measureText(currentLine).width;
+          if (lineWidth + wordWidth > width) {
+            lineCount++;
+            currentLine = words[i];
+          } else {
+            currentLine += words[i];
+          }
+        }
+        if (currentLine.trim() !== '') lineCount++;
+
+        return lineCount;
+      }
+      function calcLines() {
+        const lines = textarea.value.split('\n');
+        const textareaWidth = textarea.getBoundingClientRect().width;
+        const textareaScrollWidth = textareaWidth - textarea.clientWidth;
+        const parseNumber = (v) => v.endsWith('px') ? parseInt(v.slice(0, -2), 10) : 0;
+        const textareaPaddingLeft = parseNumber(textareaStyles.paddingLeft);
+        const textareaPaddingRight = parseNumber(textareaStyles.paddingRight);
+        const textareaContentWidth = textareaWidth - textareaPaddingLeft - textareaPaddingRight - textareaScrollWidth;
+        const numLines = lines.map(lineString => calcStringLines(lineString, textareaContentWidth));
+        let lineNumbers = [];
+        let i = 1;
+        while (numLines.length > 0) {
+          const numLinesOfSentence = numLines.shift();
+          lineNumbers.push(i);
+          if (numLinesOfSentence > 1) {
+            Array(numLinesOfSentence - 1)
+              .fill('')
+              .forEach((_) => lineNumbers.push(''));
+          }
+          i++;
+        }
+        console.log('lineNumbers', lineNumbers)
+        return lineNumbers;
+      }
+      const ro = new ResizeObserver(() => {
+        const rect = textarea.getBoundingClientRect();
+        numbers.style.height = `${rect.height}px`;
+        initLineNumbers();
+      });
+      ro.observe(textarea);
+      textarea.addEventListener('scroll', () => {
+        numbers.scrollTop = textarea.scrollTop;
+      });
+      textarea.addEventListener('input', () => {
+        initLineNumbers();
+      });
+    });
+  </script>
+</body>
+
+</html>

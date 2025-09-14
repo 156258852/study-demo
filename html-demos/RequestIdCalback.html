@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+
+<body>
+  <script>
+    const sleep = (ms) => {
+      for (let start = Date.now(); Date.now() - start < ms;) {
+        // Busy-waiting
+      }
+    }
+    const task = [
+      async function () {
+        console.log('task1 start');
+        sleep(20);
+        console.log('task1 end');
+      },
+      async function () {
+        console.log('task2 start');
+        sleep(20);
+        console.log('task2 end');
+      },
+      async function () {
+        console.log('task3 start');
+        sleep(20);
+        console.log('task3 end');
+      }
+    ];
+
+    const loop = (dateline) => {
+
+      while (task.length && dateline.timeRemaining() > 0) {
+        const fn = task.shift();
+        fn().catch(err => console.error("Task execution error:", err));
+      }
+      console.log("Time remaining:", dateline.timeRemaining());
+      if (task.length === 0) {
+        console.log("All tasks completed, stopping loop.");
+        return;
+      }
+
+      requestIdleCallback(loop);
+    };
+
+    requestIdleCallback(loop);
+  </script>
+</body>
+
+</html>
