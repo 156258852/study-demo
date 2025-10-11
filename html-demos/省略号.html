@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+      .wrap {
+        display: flex;
+        align-items: center;
+        width: 350px;
+        border: 1px dashed #ccc;
+        padding: 4px 16px;
+        gap: 16px;
+      }
+
+      .infos {
+        flex: 1;
+        display: flex;
+        gap: 8px;
+        align-items: center;
+      }
+
+      .self {
+        flex: 1;
+        padding: 4px;
+        background-color: silver;
+        border-radius: 6px;
+        /* 文字超出隐藏 */
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+      }
+
+      .live {
+        padding: 4px 16px;
+        background: cornflowerblue;
+        border-radius: 6px;
+        color: white;
+        flex-shrink: 0;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <div class="infos">
+        <!-- <div>Soccer</div> -->
+        <div class="self">Campeonato De Reserva De Primera Division C  overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;</div>
+      </div>
+      <div class="live">Live</div>
+    </div>
+  </body>
+</html>
