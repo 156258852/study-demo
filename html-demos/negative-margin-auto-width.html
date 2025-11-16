@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>无固定宽度下的负Margin效果</title>
+    <style>
+      .container {
+        width: 500px;
+        background-color: #f0f0f0;
+        padding: 20px;
+        margin: 20px auto;
+      }
+
+      .normal-flow-box {
+        background-color: lightblue;
+        padding: 10px;
+        margin: 10px;
+      }
+
+      .auto-width-negative-margin {
+        background-color: lightcoral;
+        padding: 10px;
+        margin: 0 -16px; /* 没有设置固定宽度，只有负边距 */
+      }
+
+      .info {
+        background-color: lightgreen;
+        padding: 15px;
+        margin: 20px 0;
+      }
+
+      .comparison-container {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 30px;
+      }
+
+      .box-group {
+        width: 45%;
+      }
+
+      .fixed-width-box {
+        width: 200px;
+        height: 80px;
+        background-color: lightyellow;
+        margin: 0 -16px;
+        padding: 10px;
+      }
+
+      .auto-width-box {
+        height: 80px;
+        background-color: lightpink;
+        margin: 0 -16px;
+        padding: 10px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h2>无固定宽度下的负Margin效果</h2>
+
+      <div class="normal-flow-box">普通流中的盒子</div>
+      <div class="auto-width-negative-margin">
+        没有固定宽度但有负margin的盒子 (margin: 0 -16px)
+      </div>
+      <div class="normal-flow-box">后面的盒子</div>
+
+      <div class="info">
+        <h3>解释:</h3>
+        <p>
+          当一个元素没有设置固定宽度（width）时，它的宽度默认由内容决定，并且会根据容器空间自动调整。
+        </p>
+        <p>
+          当我们给这样的元素添加负的水平margin时，实际上是增加了元素可以占用的空间，从而让元素变宽。
+        </p>
+        <p>这就是你说的"不设置固定宽。margin为负就是会把盒子变大"的现象。</p>
+      </div>
+
+      <div class="comparison-container">
+        <div class="box-group">
+          <h3>设置了固定宽度</h3>
+          <div class="fixed-width-box">
+            固定宽度: 200px<br />
+            负margin: 0 -16px<br />
+            总宽度: 仍然是200px
+          </div>
+        </div>
+
+        <div class="box-group">
+          <h3>未设置固定宽度</h3>
+          <div class="auto-width-box">
+            自动宽度<br />
+            负margin: 0 -16px<br />
+            总宽度: 变得更宽(增加了32px)
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
