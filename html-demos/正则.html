@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+  <script>
+    //常用转义正则
+    const reg = /[.*+?^${}()|[\]\\]/g
+    const escapeRegExp = (str) => str.replace(reg, '\\$&') // 转义正则,例如 '*' -> '\*'
+    
+  </script>
+</body>
+</html>
