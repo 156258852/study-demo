@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+  <script>
+    const arr = ` <filter  root='/content/dam'/>
+      <div root="1" />
+      <div root="2" />
+    `;
+    
+    // 使用正则表达式提取所有自闭合标签
+    const allSelfClosingTags = arr.match(/<[^>]+\/>/g);
+    console.log('所有自闭合标签:', allSelfClosingTags);
+    
+    // 提取特定标签（例如div）
+    const divTags = arr.match(/<div[^>]*\/>/g);
+    console.log('所有div标签:', divTags);
+    
+    // 通用函数：提取指定标签
+    function extractTags(htmlString, tagName) {
+      // 匹配自闭合标签（如 <img src="..." />）和普通标签（如 <div>...</div>）
+      const tagRegex = new RegExp(`<${tagName}[^>]*>.*?<\/${tagName}>|<${tagName}[^>]*/>`, 'g');
+      return htmlString.match(tagRegex) || [];
+    }
+    
+    // 示例：提取div标签
+    const extractedDivs = extractTags(arr, 'div');
+    console.log('提取的div标签:', extractedDivs);
+    
+
+  </script>
+</body>
+</html>
