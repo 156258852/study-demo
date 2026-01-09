@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <title>Tooltip 宽度方向动画完整 demo</title>
+  <style>
+    /* ****** 通用样式 ****** */
+    body {
+      display: flex;
+      gap: 80px;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      background: #f5f7fa;
+    }
+
+    /* 触发按钮 */
+    .btn {
+      padding: 10px 24px;
+      border: none;
+      background: #409eff;
+      color: #fff;
+      border-radius: 4px;
+      cursor: pointer;
+      position: relative;
+    }
+
+    /* ****** tooltip 本体 ****** */
+    .tooltip {
+      position: absolute;
+      bottom: calc(100% + 10px);   /* 放在按钮上方 10px */
+      left: 50%;
+      transform: translateX(-50%) scaleX(0);
+      transform-origin: left center; /* 默认往右长 */
+      white-space: nowrap;
+      background: #303133;
+      color: #fff;
+      padding: 6px 12px;
+      border-radius: 4px;
+      font-size: 12px;
+      pointer-events: none;
+      opacity: 0;
+      transition: transform .3s cubic-bezier(.4,0,.2,1),
+                  opacity .3s cubic-bezier(.4,0,.2,1);
+    }
+
+    /* 小三角 */
+    .tooltip::after {
+      content: "";
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      border: 6px solid transparent;
+      border-top-color: #303133;
+    }
+
+    /* ****** 悬停动画 ****** */
+    .btn:hover .tooltip {
+      transform: translateX(-50%) scaleX(1);
+      opacity: 1;
+    }
+
+    /* ****** 向左展开：把原点改到右侧 ****** */
+    .btn-left .tooltip {
+      transform-origin: right center;
+    }
+  </style>
+</head>
+<body>
+  <!-- 向右展开 -->
+  <button class="btn">
+    悬停我（向右）
+    <span class="tooltip">提示文字向右展开</span>
+  </button>
+
+  <!-- 向左展开 -->
+  <button class="btn btn-left">
+    悬停我（向左）
+    <span class="tooltip">提示文字向左展开</span>
+  </button>
+</body>
+</html>
