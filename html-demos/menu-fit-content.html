@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>可折叠侧边栏菜单</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f0f2f5;
+      margin: 0;
+      padding: 20px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    .container {
+      max-width: 1400px;
+      width: 100%;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+      overflow: hidden;
+      display: flex;
+      height: 85vh;
+    }
+
+    /* 侧边栏样式 */
+    .sidebar {
+      background: linear-gradient(to bottom, #2c3e50, #1a2530);
+      transition: all 0.3s ease;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      color: white;
+      position: relative;
+    }
+
+    .sidebar.collapsed {
+      width: 70px;
+    }
+
+    .sidebar.expanded {
+      width: 220px;
+    }
+
+    .logo {
+      height: 70px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+      font-size: 22px;
+      font-weight: bold;
+      background: rgba(0,0,0,0.2);
+    }
+
+    .sidebar.collapsed .logo span {
+      display: none;
+    }
+
+    .sidebar.expanded .logo span {
+      display: block;
+    }
+
+    .menu {
+      flex: 1;
+      overflow-y: auto;
+      padding: 15px 0;
+    }
+
+    .menu-item {
+      display: flex;
+      align-items: center;
+      padding: 14px 20px;
+      color: rgba(255, 255, 255, 0.75);
+      cursor: pointer;
+      transition: all 0.25s ease;
+      margin: 5px 10px;
+      border-radius: 6px;
+      position: relative;
+      min-height: 20px;
+    }
+
+    .sidebar.collapsed .menu-item {
+      justify-content: center;
+      padding: 14px 0;
+    }
+
+    .menu-item:hover {
+      background: rgba(255, 255, 255, 0.1);
+      color: white;
+    }
+
+    .menu-item.active {
+      background: #3498db;
+      color: white;
+      box-shadow: 0 2px 8px rgba(52, 152, 219, 0.3);
+    }
+
+    .menu-icon {
+      font-size: 18px;
+      width: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-right: 12px;
+      flex-shrink: 0; /* 固定图标宽度，防止收缩 */
+    }
+
+    .sidebar.collapsed .menu-icon {
+      margin-right: 0;
+    }
+
+    .menu-text {
+      flex: 1;
+      font-size: 15px;
+      opacity: 1;
+      transition: opacity 0.3s ease;
+    }
+
+    .sidebar.collapsed .menu-text {
+      opacity: 0;
+      visibility: hidden;
+      width: 0;
+      height: 0;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+    }
+
+    .toggle-btn {
+      height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      background: rgba(0,0,0,0.2);
+      color: rgba(255, 255, 255, 0.7);
+      transition: all 0.3s;
+    }
+
+    .toggle-btn:hover {
+      background: rgba(0,0,0,0.3);
+      color: white;
+    }
+
+    /* 主内容区 */
+    .main-content {
+      flex: 1;
+      padding: 30px;
+      background: #f8fafc;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .content-header {
+      margin-bottom: 25px;
+      padding-bottom: 15px;
+      border-bottom: 1px solid #e2e8f0;
+    }
+
+    .content-title {
+      font-size: 26px;
+      color: #2d3748;
+      margin: 0;
+      font-weight: 600;
+    }
+
+    .content-description {
+      color: #4a5568;
+      line-height: 1.7;
+      font-size: 16px;
+    }
+
+    .content-card {
+      background: white;
+      border-radius: 10px;
+      padding: 25px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+      margin-top: 20px;
+      flex: 1;
+    }
+
+    .card-title {
+      font-size: 20px;
+      color: #2c3e50;
+      margin-top: 0;
+      margin-bottom: 15px;
+      border-bottom: 1px dashed #e2e8f0;
+      padding-bottom: 10px;
+    }
+
+    .card-content {
+      color: #4a5568;
+      line-height: 1.7;
+    }
+
+    /* 响应式设计 */
+    @media (max-width: 768px) {
+      .container {
+        flex-direction: column;
+        height: auto;
+      }
+      
+      .sidebar {
+        width: 100% !important;
+        height: auto;
+        flex-direction: row;
+      }
+      
+      .sidebar .menu {
+        display: flex;
+        flex-wrap: wrap;
+        padding: 10px;
+      }
+      
+      .menu-item {
+        margin: 5px;
+        padding: 10px 15px;
+      }
+      
+      .main-content {
+        height: auto;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- 侧边栏 -->
+    <div class="sidebar expanded" id="sidebar">
+      <div class="logo">
+        <span>MyApp</span>
+      </div>
+      <div class="menu">
+        <div class="menu-item active" data-key="dashboard">
+          <span class="menu-icon">📊</span>
+          <span class="menu-text">仪表盘</span>
+        </div>
+        <div class="menu-item" data-key="analytics">
+          <span class="menu-icon">📈</span>
+          <span class="menu-text">数据分析</span>
+        </div>
+        <div class="menu-item" data-key="users">
+          <span class="menu-icon">👥</span>
+          <span class="menu-text">用户管理</span>
+        </div>
+        <div class="menu-item" data-key="products">
+          <span class="menu-icon">📦</span>
+          <span class="menu-text">产品列表</span>
+        </div>
+        <div class="menu-item" data-key="orders">
+          <span class="menu-icon">📋</span>
+          <span class="menu-text">订单管理</span>
+        </div>
+        <div class="menu-item" data-key="settings">
+          <span class="menu-icon">⚙️</span>
+          <span class="menu-text">系统设置</span>
+        </div>
+        <div class="menu-item" data-key="reports">
+          <span class="menu-icon">📝</span>
+          <span class="menu-text">报表中心</span>
+        </div>
+        <div class="menu-item" data-key="help">
+          <span class="menu-icon">❓</span>
+          <span class="menu-text">帮助中心</span>
+        </div>
+      </div>
+      <div class="toggle-btn" id="toggleBtn">
+        <span>◀</span>
+      </div>
+    </div>
+
+    <!-- 主内容区 -->
+    <div class="main-content">
+      <div class="content-header">
+        <h1 class="content-title" id="contentTitle">仪表盘</h1>
+      </div>
+      <div class="content-description">
+        欢迎使用我们的应用程序。从左侧菜单选择一个功能开始操作。
+      </div>
+      
+      <div class="content-card">
+        <h2 class="card-title" id="cardTitle">欢迎来到仪表盘</h2>
+        <div class="card-content" id="cardContent">
+          <p>这里是应用程序的核心区域。您可以在这里查看关键指标和重要信息。</p>
+          <p>左侧的侧边栏菜单支持展开和收起，点击底部的箭头按钮可以切换菜单状态。</p>
+          <p>当菜单收起时，只会显示图标，这样可以最大化内容显示区域。</p>
+          <p>点击不同的菜单项，这里的内容将会相应变化。</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const sidebar = document.getElementById('sidebar');
+      const toggleBtn = document.getElementById('toggleBtn');
+      const menuItems = document.querySelectorAll('.menu-item');
+      const contentTitle = document.getElementById('contentTitle');
+      const cardTitle = document.getElementById('cardTitle');
+      const cardContent = document.getElementById('cardContent');
+      let isCollapsed = false;
+
+      // 切换侧边栏展开/收起
+      toggleBtn.addEventListener('click', function() {
+        isCollapsed = !isCollapsed;
+        
+        if (isCollapsed) {
+          sidebar.classList.remove('expanded');
+          sidebar.classList.add('collapsed');
+          this.innerHTML = '<span>▶</span>';
+        } else {
+          sidebar.classList.remove('collapsed');
+          sidebar.classList.add('expanded');
+          this.innerHTML = '<span>◀</span>';
+        }
+      });
+
+      // 处理菜单项点击
+      menuItems.forEach(item => {
+        item.addEventListener('click', function() {
+          // 移除所有active类
+          menuItems.forEach(i => i.classList.remove('active'));
+          
+          // 给当前项添加active类
+          this.classList.add('active');
+          
+          // 获取菜单项数据
+          const key = this.getAttribute('data-key');
+          const text = this.querySelector('.menu-text').textContent;
+          
+          // 更新主内容区
+          contentTitle.textContent = text;
+          cardTitle.textContent = text + " 页面";
+          
+          // 根据菜单项更新内容
+          switch(key) {
+            case 'dashboard':
+              cardContent.innerHTML = `
+                <p>这是仪表盘页面，您可以在这里查看系统的整体概况。</p>
+                <p>包括关键性能指标、近期活动和重要通知等。</p>
+                <ul>
+                  <li>总用户数: 12,458</li>
+                  <li>今日活跃: 2,367</li>
+                  <li>收入统计: ¥125,480</li>
+                </ul>
+              `;
+              break;
+            case 'analytics':
+              cardContent.innerHTML = `
+                <p>数据分析页面提供详细的业务数据报告。</p>
+                <p>您可以查看趋势分析、用户行为数据和转化率等关键指标。</p>
+                <p>支持多种图表类型，包括折线图、柱状图和饼图等。</p>
+              `;
+              break;
+            case 'users':
+              cardContent.innerHTML = `
+                <p>用户管理页面用于查看和管理所有注册用户。</p>
+                <p>您可以搜索用户、查看用户详情、编辑用户信息或执行管理操作。</p>
+                <p>还提供用户分组、权限分配等功能。</p>
+              `;
+              break;
+            case 'products':
+              cardContent.innerHTML = `
+                <p>产品列表页面展示所有产品的详细信息。</p>
+                <p>您可以添加新产品、编辑现有产品、设置库存和价格等。</p>
+                <p>支持批量操作和导入导出功能。</p>
+              `;
+              break;
+            case 'orders':
+              cardContent.innerHTML = `
+                <p>订单管理页面处理所有客户订单。</p>
+                <p>您可以查看订单状态、处理发货、管理退货退款等。</p>
+                <p>提供订单统计和财务结算功能。</p>
+              `;
+              break;
+            case 'settings':
+              cardContent.innerHTML = `
+                <p>系统设置页面配置应用程序的全局参数。</p>
+                <p>包括安全设置、邮件配置、支付接口和其他系统选项。</p>
+                <p>仅限管理员访问。</p>
+              `;
+              break;
+            case 'reports':
+              cardContent.innerHTML = `
+                <p>报表中心生成各种业务报告。</p>
+                <p>包括销售报告、用户分析、财务报表等。</p>
+                <p>支持自定义时间范围和数据筛选。</p>
+              `;
+              break;
+            case 'help':
+              cardContent.innerHTML = `
+                <p>帮助中心提供使用指南和技术支持。</p>
+                <p>您可以查看常见问题解答、用户手册或联系技术支持团队。</p>
+                <p>我们提供在线客服和工单系统。</p>
+              `;
+              break;
+            default:
+              cardContent.innerHTML = `<p>这是 ${text} 页面的内容区域。</p>`;
+          }
+        });
+      });
+    });
+  </script>
+</body>
+</html>
