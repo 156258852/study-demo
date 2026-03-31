@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DOM 添加元素方法演示</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    h1 {
+      text-align: center;
+      color: white;
+      margin-bottom: 30px;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+    }
+
+    .demo-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+      gap: 20px;
+      max-width: 1600px;
+      margin: 0 auto;
+    }
+
+    .demo-card {
+      background: white;
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    }
+
+    .demo-card h2 {
+      color: #333;
+      margin-bottom: 10px;
+      font-size: 1.1rem;
+      border-bottom: 2px solid #667eea;
+      padding-bottom: 8px;
+    }
+
+    .demo-card > p {
+      color: #666;
+      font-size: 0.9rem;
+      margin-bottom: 15px;
+    }
+
+    .code-block {
+      background: #1e1e1e;
+      border-radius: 8px;
+      padding: 15px;
+      margin-bottom: 15px;
+      overflow-x: auto;
+    }
+
+    .code-block pre {
+      margin: 0;
+      font-family: 'Monaco', 'Consolas', 'Courier New', monospace;
+      font-size: 0.75rem;
+      line-height: 1.6;
+      color: #d4d4d4;
+      white-space: pre-wrap;
+    }
+
+    .keyword { color: #569cd6; }
+    .string { color: #ce9178; }
+    .comment { color: #6a9955; }
+    .method { color: #dcdcaa; }
+    .variable { color: #9cdcfe; }
+    .property { color: #9cdcfe; }
+    .bracket { color: #ffd700; }
+
+    .demo-card button {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .demo-card button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+    }
+
+    .demo-card button:active {
+      transform: translateY(0);
+    }
+
+    .container {
+      min-height: 100px;
+      background: #f8f9fa;
+      border-radius: 8px;
+      padding: 15px;
+      margin-top: 15px;
+      border: 2px dashed #dee2e6;
+    }
+
+    .container .new-element {
+      background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+      color: white;
+      padding: 8px 12px;
+      border-radius: 4px;
+      margin: 5px 0;
+      animation: fadeIn 0.3s ease;
+      font-size: 0.85rem;
+    }
+
+    .container .reference {
+      background: #ffc107;
+      color: #333;
+      padding: 8px 12px;
+      border-radius: 4px;
+      margin: 5px 0;
+      font-weight: 500;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(-10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .clear-btn {
+      background: #dc3545 !important;
+    }
+
+    .clear-btn:hover {
+      box-shadow: 0 4px 12px rgba(220, 53, 69, 0.4) !important;
+    }
+
+    .counter {
+      font-size: 0.8rem;
+      color: #888;
+      margin-top: 10px;
+    }
+
+    .btn-group {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+  </style>
+</head>
+<body>
+  <h1>🎯 DOM 添加元素方法演示</h1>
+  <div class="demo-grid" id="demoGrid"></div>
+
+  <script>
+    // 卡片配置数据
+    const demos = [
+      {
+        name: 'appendChild()',
+        desc: '将元素添加到父元素的<code>末尾</code>',
+        code: `<span class="comment">// 获取父元素</span>
+<span class="keyword">const</span> <span class="variable">parent</span> = <span class="variable">document</span>.<span class="method">querySelector</span>(<span class="string">'.container'</span>);
+
+<span class="comment">// 创建新元素</span>
+<span class="keyword">const</span> <span class="variable">newEl</span> = <span class="variable">document</span>.<span class="method">createElement</span>(<span class="string">'div'</span>);
+<span class="variable">newEl</span>.<span class="property">textContent</span> = <span class="string">'新元素'</span>;
+<span class="variable">newEl</span>.<span class="property">className</span> = <span class="string">'item'</span>;
+
+<span class="comment">// 添加到父元素末尾</span>
+<span class="variable">parent</span>.<span class="method">appendChild</span>(<span class="variable">newEl</span>);`,
+        action: '添加元素',
+        counterLabel: '元素数量'
+      },
+      {
+        name: 'insertBefore()',
+        desc: '将元素插入到参考元素<code>之前</code>',
+        code: `<span class="comment">// 获取父元素和参考元素</span>
+<span class="keyword">const</span> <span class="variable">parent</span> = <span class="variable">document</span>.<span class="method">querySelector</span>(<span class="string">'.container'</span>);
+<span class="keyword">const</span> <span class="variable">reference</span> = <span class="variable">document</span>.<span class="method">querySelector</span>(<span class="string">'.reference'</span>);
+
+<span class="comment">// 创建新元素</span>
+<span class="keyword">const</span> <span class="variable">newEl</span> = <span class="variable">document</span>.<span class="method">createElement</span>(<span class="string">'div'</span>);
+<span class="variable">newEl</span>.<span class="property">textContent</span> = <span class="string">'新元素'</span>;
+
+<span class="comment">// 插入到参考元素之前</span>
+<span class="variable">parent</span>.<span class="method">insertBefore</span>(<span class="variable">newEl</span>, <span class="variable">reference</span>);`,
+        action: '添加元素',
+        counterLabel: '元素数量'
+      },
+      {
+        name: 'after()',
+        desc: '将元素插入到参考元素<code>之后</code>',
+        code: `<span class="comment">// 获取参考元素</span>
+<span class="keyword">const</span> <span class="variable">reference</span> = <span class="variable">document</span>.<span class="method">querySelector</span>(<span class="string">'.reference'</span>);
+
+<span class="comment">// 创建新元素</span>
+<span class="keyword">const</span> <span class="variable">newEl</span> = <span class="variable">document</span>.<span class="method">createElement</span>(<span class="string">'div'</span>);
+<span class="variable">newEl</span>.<span class="property">textContent</span> = <span class="string">'新元素'</span>;
+
+<span class="comment">// 插入到参考元素之后</span>
+<span class="variable">reference</span>.<span class="method">after</span>(<span class="variable">newEl</span>);`,
+        action: '添加元素',
+        counterLabel: '元素数量'
+      },
+      {
+        name: 'before()',
+        desc: '将元素插入到参考元素<code>之前</code>',
+        code: `<span class="comment">// 获取参考元素</span>
+<span class="keyword">const</span> <span class="variable">reference</span> = <span class="variable">document</span>.<span class="method">querySelector</span>(<span class="string">'.reference'</span>);
+
+<span class="comment">// 创建新元素</span>
+<span class="keyword">const</span> <span class="variable">newEl</span> = <span class="variable">document</span>.<span class="method">createElement</span>(<span class="string">'div'</span>);
+<span class="variable">newEl</span>.<span class="property">textContent</span> = <span class="string">'新元素'</span>;
+
+<span class="comment">// 插入到参考元素之前</span>
+<span class="variable">reference</span>.<span class="method">before</span>(<span class="variable">newEl</span>);`,
+        action: '添加元素',
+        counterLabel: '元素数量'
+      },
+      {
+        name: 'prepend()',
+        desc: '将元素添加到父元素的<code>开头</code>',
+        code: `<span class="comment">// 获取父元素</span>
+<span class="keyword">const</span> <span class="variable">parent</span> = <span class="variable">document</span>.<span class="method">querySelector</span>(<span class="string">'.container'</span>);
+
+<span class="comment">// 创建新元素</span>
+<span class="keyword">const</span> <span class="variable">newEl</span> = <span class="variable">document</span>.<span class="method">createElement</span>(<span class="string">'div'</span>);
+<span class="variable">newEl</span>.<span class="property">textContent</span> = <span class="string">'新元素'</span>;
+
+<span class="comment">// 添加到父元素开头</span>
+<span class="variable">parent</span>.<span class="method">prepend</span>(<span class="variable">newEl</span>);`,
+        action: '添加元素',
+        counterLabel: '元素数量'
+      },
+      {
+        name: 'append()',
+        desc: '将元素添加到父元素的<code>末尾</code>（支持多个参数）',
+        code: `<span class="comment">// 获取父元素</span>
+<span class="keyword">const</span> <span class="variable">parent</span> = <span class="variable">document</span>.<span class="method">querySelector</span>(<span class="string">'.container'</span>);
+
+<span class="comment">// 创建多个新元素</span>
+<span class="keyword">const</span> <span class="variable">el1</span> = <span class="variable">document</span>.<span class="method">createElement</span>(<span class="string">'div'</span>);
+<span class="keyword">const</span> <span class="variable">el2</span> = <span class="variable">document</span>.<span class="method">createElement</span>(<span class="string">'span'</span>);
+
+<span class="comment">// 可以一次添加多个元素和文本</span>
+<span class="variable">parent</span>.<span class="method">append</span>(<span class="variable">el1</span>, <span class="variable">el2</span>, <span class="string">'文本内容'</span>);`,
+        action: '添加元素',
+        counterLabel: '元素数量'
+      },
+      {
+        name: 'insertAdjacentHTML()',
+        desc: '在指定位置插入 HTML 字符串',
+        code: `<span class="comment">// 获取目标元素</span>
+<span class="keyword">const</span> <span class="variable">el</span> = <span class="variable">document</span>.<span class="method">querySelector</span>(<span class="string">'.reference'</span>);
+<span class="keyword">const</span> <span class="variable">html</span> = <span class="string">'&lt;div class="item"&gt;新元素&lt;/div&gt;'</span>;
+
+<span class="comment">// 四个位置参数:</span>
+<span class="variable">el</span>.<span class="method">insertAdjacentHTML</span>(<span class="string">'beforebegin'</span>, <span class="variable">html</span>); <span class="comment">// 元素外部之前</span>
+<span class="variable">el</span>.<span class="method">insertAdjacentHTML</span>(<span class="string">'afterbegin'</span>, <span class="variable">html</span>);  <span class="comment">// 元素内部开头</span>
+<span class="variable">el</span>.<span class="method">insertAdjacentHTML</span>(<span class="string">'beforeend'</span>, <span class="variable">html</span>);   <span class="comment">// 元素内部末尾</span>
+<span class="variable">el</span>.<span class="method">insertAdjacentHTML</span>(<span class="string">'afterend'</span>, <span class="variable">html</span>);   <span class="comment">// 元素外部之后</span>`,
+        action: '添加元素',
+        counterLabel: '元素数量'
+      },
+      {
+        name: 'replaceWith()',
+        desc: '替换参考元素为新元素',
+        code: `<span class="comment">// 获取要替换的元素</span>
+<span class="keyword">const</span> <span class="variable">oldEl</span> = <span class="variable">document</span>.<span class="method">querySelector</span>(<span class="string">'.reference'</span>);
+
+<span class="comment">// 创建新元素</span>
+<span class="keyword">const</span> <span class="variable">newEl</span> = <span class="variable">document</span>.<span class="method">createElement</span>(<span class="string">'div'</span>);
+<span class="variable">newEl</span>.<span class="property">textContent</span> = <span class="string">'替换后的元素'</span>;
+<span class="variable">newEl</span>.<span class="property">className</span> = <span class="string">'new-item'</span>;
+
+<span class="comment">// 替换旧元素</span>
+<span class="variable">oldEl</span>.<span class="method">replaceWith</span>(<span class="variable">newEl</span>);`,
+        action: '替换元素',
+        counterLabel: '替换次数',
+        isReplace: true
+      }
+    ];
+
+    // 计数器数组
+    const counters = demos.map(() => 1);
+
+    // 创建新元素
+    function createNewElement(text) {
+      const div = document.createElement('div');
+      div.className = 'new-element';
+      div.textContent = text;
+      return div;
+    }
+
+    // 更新计数器
+    function updateCounter(index) {
+      const counterSpan = document.querySelector(`#container${index + 1}`).parentElement.querySelector('.counter span');
+      counterSpan.textContent = counters[index];
+    }
+
+    // 清空容器
+    function clearContainer(index) {
+      const container = document.getElementById(`container${index + 1}`);
+      container.innerHTML = '<div class="reference">参考元素</div>';
+      counters[index] = 1;
+      updateCounter(index);
+    }
+
+    // 演示函数
+    const demoFunctions = [
+      // appendChild
+      (container, index) => {
+        counters[index]++;
+        container.appendChild(createNewElement(`appendChild #${counters[index] - 1}`));
+      },
+      // insertBefore
+      (container, index) => {
+        const reference = container.querySelector('.reference');
+        counters[index]++;
+        container.insertBefore(createNewElement(`insertBefore #${counters[index] - 1}`), reference);
+      },
+      // after
+      (container, index) => {
+        const reference = container.querySelector('.reference');
+        counters[index]++;
+        reference.after(createNewElement(`after #${counters[index] - 1}`));
+      },
+      // before
+      (container, index) => {
+        const reference = container.querySelector('.reference');
+        counters[index]++;
+        reference.before(createNewElement(`before #${counters[index] - 1}`));
+      },
+      // prepend
+      (container, index) => {
+        counters[index]++;
+        container.prepend(createNewElement(`prepend #${counters[index] - 1}`));
+      },
+      // append
+      (container, index) => {
+        counters[index]++;
+        container.append(
+          createNewElement(`append #${counters[index] - 1}A`),
+          createNewElement(`append #${counters[index] - 1}B`)
+        );
+        counters[index]++;
+      },
+      // insertAdjacentHTML
+      (container, index) => {
+        const reference = container.querySelector('.reference');
+        counters[index]++;
+        const positions = ['beforebegin', 'afterbegin', 'beforeend', 'afterend'];
+        const position = positions[(counters[index] - 1) % 4];
+        reference.insertAdjacentHTML('afterend',
+          `<div class="new-element">${position} #${Math.floor((counters[index] - 1) / 4) + 1}</div>`);
+      },
+      // replaceWith
+      (container, index) => {
+        const reference = container.querySelector('.reference');
+        counters[index]++;
+        const newEl = createNewElement(`替换元素 #${counters[index] - 1}`);
+        newEl.className = 'new-element reference';
+        reference.replaceWith(newEl);
+      }
+    ];
+
+    // 渲染卡片
+    function renderDemos() {
+      const grid = document.getElementById('demoGrid');
+
+      demos.forEach((demo, index) => {
+        const card = document.createElement('div');
+        card.className = 'demo-card';
+        card.innerHTML = `
+          <h2>${demo.name}</h2>
+          <p>${demo.desc}</p>
+          <div class="code-block">
+            <pre>${demo.code}</pre>
+          </div>
+          <div class="btn-group">
+            <button id="actionBtn${index}">${demo.action}</button>
+            <button class="clear-btn" id="clearBtn${index}">${demo.isReplace ? '重置' : '清空'}</button>
+          </div>
+          <div class="container" id="container${index + 1}">
+            <div class="reference">参考元素</div>
+          </div>
+          <div class="counter">${demo.counterLabel}: <span>${demo.isReplace ? 0 : 1}</span></div>
+        `;
+        grid.appendChild(card);
+
+        // 初始化 replaceWith 的计数器
+        if (demo.isReplace) {
+          counters[index] = 0;
+        }
+
+        // 绑定事件
+        document.getElementById(`actionBtn${index}`).addEventListener('click', () => {
+          const container = document.getElementById(`container${index + 1}`);
+          demoFunctions[index](container, index);
+          updateCounter(index);
+        });
+
+        document.getElementById(`clearBtn${index}`).addEventListener('click', () => {
+          clearContainer(index);
+          if (demo.isReplace) {
+            counters[index] = 0;
+            updateCounter(index);
+          }
+        });
+      });
+    }
+
+    renderDemos();
+  </script>
+</body>
+</html>
