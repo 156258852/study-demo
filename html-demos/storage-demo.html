@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Web Storage 使用演示</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        h1 {
+            color: #333;
+            border-bottom: 2px solid #4CAF50;
+            padding-bottom: 10px;
+        }
+        h2 {
+            color: #555;
+            margin-top: 30px;
+        }
+        .section {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .demo-area {
+            margin-top: 15px;
+        }
+        button {
+            background-color: #4CAF50;
+            border: none;
+            color: white;
+            padding: 10px 16px;
+            margin: 5px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        button.danger {
+            background-color: #f44336;
+        }
+        button.danger:hover {
+            background-color: #d32f2f;
+        }
+        button.info {
+            background-color: #2196F3;
+        }
+        button.info:hover {
+            background-color: #1976D2;
+        }
+        input, textarea {
+            padding: 10px;
+            margin: 5px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            width: 200px;
+        }
+        .result {
+            background-color: #f8f8f8;
+            border: 1px solid #ddd;
+            padding: 15px;
+            margin-top: 10px;
+            border-radius: 4px;
+            font-family: monospace;
+            white-space: pre-wrap;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .warning {
+            background-color: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 10px 15px;
+            margin: 10px 0;
+        }
+        .info-box {
+            background-color: #d1ecf1;
+            border-left: 4px solid #17a2b8;
+            padding: 10px 15px;
+            margin: 10px 0;
+        }
+        code {
+            background-color: #e8e8e8;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 13px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+        }
+        table th, table td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
+        }
+        table th {
+            background-color: #4CAF50;
+            color: white;
+        }
+        table tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+    </style>
+</head>
+<body>
+    <h1>Web Storage 使用演示</h1>
+
+    <div class="section">
+        <h2>📖 基础知识</h2>
+        <div class="info-box">
+            <strong>Web Storage 提供两种机制：</strong>
+            <ul>
+                <li><code>sessionStorage</code>：会话级存储，页面关闭时数据丢失</li>
+                <li><code>localStorage</code>：持久化存储，除非手动清除，否则数据永久保存</li>
+            </ul>
+        </div>
+        <table>
+            <tr>
+                <th>特性</th>
+                <th>sessionStorage</th>
+                <th>localStorage</th>
+            </tr>
+            <tr>
+                <td>生命周期</td>
+                <td>页面会话结束（关闭标签/浏览器）</td>
+                <td>永久存储，除非手动清除</td>
+            </tr>
+            <tr>
+                <td>共享范围</td>
+                <td>仅当前页面/标签</td>
+                <td>同源的所有页面/标签</td>
+            </tr>
+            <tr>
+                <td>存储大小</td>
+                <td>约 5MB</td>
+                <td>约 5MB</td>
+            </tr>
+        </table>
+    </div>
+
+    <div class="section">
+        <h2>📦 基本使用：存储和读取</h2>
+        <div class="demo-area">
+            <input type="text" id="storageKey" placeholder="输入键名">
+            <input type="text" id="storageValue" placeholder="输入值">
+            <br>
+            <button onclick="saveData('localStorage')">存入 localStorage</button>
+            <button onclick="saveData('sessionStorage')">存入 sessionStorage</button>
+            <button class="info" onclick="readData('localStorage')">从 localStorage 读取</button>
+            <button class="info" onclick="readData('sessionStorage')">从 sessionStorage 读取</button>
+            <div id="basicResult" class="result">等待操作...</div>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>⚠️ 数据会被强制转为字符串的情况</h2>
+        <div class="warning">
+            <strong>重要：</strong><code>localStorage</code> 和 <code>sessionStorage</code> 只能存储字符串类型。
+            调用 <code>setItem(key, value)</code> 时，所有非字符串值都会被自动调用 <code>toString()</code> 方法转换。
+        </div>
+        <div class="demo-area">
+            <button class="info" onclick="demoTypeConversion()">演示类型转换</button>
+            <div id="typeResult" class="result">等待演示...</div>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>🔴 属性会丢失的情况</h2>
+        <div class="warning">
+            <strong>属性丢失场景：</strong>
+            <ul>
+                <li>存储对象时，如果对象包含 <code>function</code>、<code>Symbol</code>、<code>undefined</code> 类型的值，这些属性会被 <code>JSON.stringify()</code> 忽略</li>
+                <li>存储 <code>Date</code> 对象会变成字符串，无法恢复为 Date 实例</li>
+                <li>存储 <code>RegExp</code>、<code>Map</code>、<code>Set</code> 等特殊对象会变成空对象 <code>{}</code></li>
+            </ul>
+        </div>
+        <div class="demo-area">
+            <button class="danger" onclick="demoDataLoss()">演示数据丢失</button>
+            <div id="lossResult" class="result">等待演示...</div>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>🧹 清空存储</h2>
+        <div class="demo-area">
+            <button class="danger" onclick="clearStorage('localStorage')">清空 localStorage</button>
+            <button class="danger" onclick="clearStorage('sessionStorage')">清空 sessionStorage</button>
+            <div id="clearResult" class="result">等待操作...</div>
+        </div>
+    </div>
+
+    <script>
+        // ================= 基本存储操作 =================
+        function saveData(type) {
+            const key = document.getElementById('storageKey').value.trim();
+            const value = document.getElementById('storageValue').value.trim();
+            const resultDiv = document.getElementById('basicResult');
+
+            if (!key || !value) {
+                resultDiv.textContent = '❌ 请输入键名和值';
+                return;
+            }
+
+            try {
+                const storage = type === 'localStorage' ? localStorage : sessionStorage;
+                storage.setItem(key, value);
+                resultDiv.textContent = `✅ 成功存入 ${type}\n键: "${key}"\n值: "${value}"\n类型: ${typeof value}`;
+            } catch (e) {
+                resultDiv.textContent = `❌ 存储失败: ${e.message}`;
+            }
+        }
+
+        function readData(type) {
+            const key = document.getElementById('storageKey').value.trim();
+            const resultDiv = document.getElementById('basicResult');
+
+            if (!key) {
+                resultDiv.textContent = '❌ 请输入键名';
+                return;
+            }
+
+            try {
+                const storage = type === 'localStorage' ? localStorage : sessionStorage;
+                const value = storage.getItem(key);
+                if (value !== null) {
+                    resultDiv.textContent = `✅ 读取成功\n键: "${key}"\n值: "${value}"\n类型: ${typeof value}\n\n⚠️ 注意：读取的值永远是字符串类型或 null`;
+                } else {
+                    resultDiv.textContent = `⚠️ 键 "${key}" 不存在，返回 null`;
+                }
+            } catch (e) {
+                resultDiv.textContent = `❌ 读取失败: ${e.message}`;
+            }
+        }
+
+        // ================= 类型转换演示 =================
+        function demoTypeConversion() {
+            const resultDiv = document.getElementById('typeResult');
+            const logs = [];
+
+            const testCases = [
+                { name: '字符串', value: 'hello' },
+                { name: '数字', value: 42 },
+                { name: '布尔值', value: true },
+                { name: 'null', value: null },
+                { name: '数组', value: [1, 2, 3] },
+                { name: '普通对象', value: { a: 1 } },
+                { name: '函数', value: function() { return 'test'; } },
+                { name: 'undefined', value: undefined },
+                { name: 'Date对象', value: new Date('2024-01-01') },
+                { name: '正则表达式', value: /abc/g },
+            ];
+
+            logs.push('========== 类型转换演示 ==========\n');
+
+            testCases.forEach(test => {
+                logs.push(`📌 存储 ${test.name}:`);
+                logs.push(`   原始值: ${test.value}`);
+                logs.push(`   原始类型: ${typeof test.value}`);
+
+                localStorage.setItem('test', test.value);
+                const stored = localStorage.getItem('test');
+
+                logs.push(`   存储后的值: ${stored}`);
+                logs.push(`   存储后类型: ${typeof stored}`);
+                logs.push(`   转换说明: ${getConversionNote(test.name)}`);
+                logs.push('');
+            });
+
+            localStorage.removeItem('test');
+            resultDiv.textContent = logs.join('\n');
+        }
+
+        function getConversionNote(name) {
+            const notes = {
+                '字符串': '保持不变',
+                '数字': '通过 toString() 转为字符串 "42"',
+                '布尔值': '通过 toString() 转为字符串 "true"',
+                'null': '转为字符串 "null"',
+                '数组': '通过 toString() 转为 "1,2,3"',
+                '普通对象': '通过 toString() 转为 "[object Object]"',
+                '函数': '转为函数定义字符串',
+                'undefined': '转为字符串 "undefined"',
+                'Date对象': '通过 toString() 转为日期字符串',
+                '正则表达式': '通过 toString() 转为 "/abc/g"',
+            };
+            return notes[name] || '';
+        }
+
+        // ================= 数据丢失演示 =================
+        function demoDataLoss() {
+            const resultDiv = document.getElementById('lossResult');
+            const logs = [];
+
+            logs.push('========== 数据丢失演示 ==========\n');
+
+            // 演示 1: JSON.stringify 丢失函数、undefined、Symbol
+            logs.push('🔴 场景 1: 使用 JSON.stringify 存储对象');
+            logs.push('------------------------------------------------');
+
+            const originalObj = {
+                name: '张三',
+                age: 25,
+                sayHello: function() { console.log('Hello'); },
+                hobby: undefined,
+                [Symbol('id')]: 123,
+                birth: new Date('1999-01-01'),
+                address: { city: '北京' }
+            };
+
+            logs.push(`原始对象:`);
+            logs.push(`  - name: "${originalObj.name}" (string)`);
+            logs.push(`  - age: ${originalObj.age} (number)`);
+            logs.push(`  - sayHello: ${typeof originalObj.sayHello} (函数)`);
+            logs.push(`  - hobby: ${originalObj.hobby} (undefined)`);
+            logs.push(`  - Symbol('id'): ${typeof originalObj[Symbol('id')]} (Symbol)`);
+            logs.push(`  - birth: ${originalObj.birth} (Date对象)`);
+            logs.push(`  - address: ${JSON.stringify(originalObj.address)} (嵌套对象)`);
+
+            // 存入 localStorage
+            localStorage.setItem('user', JSON.stringify(originalObj));
+            const storedStr = localStorage.getItem('user');
+            const parsedObj = JSON.parse(storedStr);
+
+            logs.push(`\n从 localStorage 读取并 JSON.parse 后:`);
+            logs.push(`  - name: "${parsedObj.name}" ✅ 保留`);
+            logs.push(`  - age: ${parsedObj.age} ✅ 保留（但类型变为 number，因为 JSON 保留了数字）`);
+            logs.push(`  - sayHello: ${parsedObj.sayHello} ❌ 丢失（JSON.stringify 会忽略函数）`);
+            logs.push(`  - hobby: ${parsedObj.hobby} ❌ 丢失（JSON.stringify 会忽略 undefined）`);
+            logs.push(`  - Symbol('id'): ${parsedObj[Symbol('id')]} ❌ 丢失（JSON.stringify 会忽略 Symbol）`);
+            logs.push(`  - birth: "${parsedObj.birth}" ⚠️ 变为字符串，不再是 Date 对象`);
+            logs.push(`  - address: ${JSON.stringify(parsedObj.address)} ✅ 嵌套对象保留`);
+            logs.push('');
+
+            // 演示 2: 直接存储对象
+            logs.push('🔴 场景 2: 直接存储对象（不调用 JSON.stringify）');
+            logs.push('------------------------------------------------');
+
+            const obj = { x: 1, y: 2 };
+            localStorage.setItem('point', obj);
+            const storedPoint = localStorage.getItem('point');
+            logs.push(`原始对象: ${JSON.stringify(obj)}`);
+            logs.push(`直接存储后的值: "${storedPoint}"`);
+            logs.push(`❌ 结果变成了 "[object Object]"，所有属性丢失！`);
+            logs.push(`原因：直接调用 obj.toString() 返回 "[object Object]"`);
+            logs.push('');
+
+            // 演示 3: 特殊对象类型
+            logs.push('🔴 场景 3: 存储特殊对象类型（Map、Set、RegExp）');
+            logs.push('------------------------------------------------');
+
+            const map = new Map([['a', 1], ['b', 2]]);
+            const set = new Set([1, 2, 3]);
+            const regex = /test/gi;
+
+            localStorage.setItem('myMap', JSON.stringify(map));
+            localStorage.setItem('mySet', JSON.stringify(set));
+            localStorage.setItem('myRegex', JSON.stringify(regex));
+
+            logs.push(`Map 对象: ${JSON.stringify(map)} -> "${localStorage.getItem('myMap')}" (空对象 {})`);
+            logs.push(`Set 对象: ${JSON.stringify(set)} -> "${localStorage.getItem('mySet')}" (空数组 [])`);
+            logs.push(`RegExp 对象: ${JSON.stringify(regex)} -> "${localStorage.getItem('myRegex')}" (空对象 {})`);
+            logs.push('');
+
+            // 演示 4: Date 对象
+            logs.push('🔴 场景 4: 存储 Date 对象');
+            logs.push('------------------------------------------------');
+
+            const now = new Date();
+            localStorage.setItem('timestamp', JSON.stringify(now));
+            const storedDate = JSON.parse(localStorage.getItem('timestamp'));
+
+            logs.push(`原始 Date: ${now} (类型: ${typeof now})`);
+            logs.push(`存储后: ${storedDate} (类型: ${typeof storedDate})`);
+            logs.push(`⚠️ 类型变为字符串，不再是 Date 实例`);
+            logs.push(`恢复方法: 需要使用 new Date(storedDate) 重新构造`);
+            logs.push('');
+
+            // 演示 5: 循环引用
+            logs.push('🔴 场景 5: 循环引用对象');
+            logs.push('------------------------------------------------');
+
+            const objA = { name: 'A' };
+            const objB = { name: 'B', ref: objA };
+            objA.ref = objB; // 创建循环引用
+
+            logs.push('尝试存储循环引用对象会抛出错误:');
+            try {
+                localStorage.setItem('circular', JSON.stringify(objA));
+            } catch (e) {
+                logs.push(`❌ 错误: ${e.message}`);
+            }
+            logs.push('');
+
+            // 清理
+            ['user', 'point', 'myMap', 'mySet', 'myRegex', 'timestamp', 'circular'].forEach(key => {
+                localStorage.removeItem(key);
+            });
+
+            resultDiv.textContent = logs.join('\n');
+        }
+
+        // ================= 清空存储 =================
+        function clearStorage(type) {
+            const resultDiv = document.getElementById('clearResult');
+
+            try {
+                const storage = type === 'localStorage' ? localStorage : sessionStorage;
+                const before = storage.length;
+                storage.clear();
+                resultDiv.textContent = `✅ 已清空 ${type}\n清空前有 ${before} 个键值对\n清空后有 ${storage.length} 个键值对`;
+            } catch (e) {
+                resultDiv.textContent = `❌ 清空失败: ${e.message}`;
+            }
+        }
+
+        // 页面加载时显示当前存储状态
+        window.addEventListener('load', () => {
+            console.log('localStorage 当前键数量:', localStorage.length);
+            console.log('sessionStorage 当前键数量:', sessionStorage.length);
+        });
+    </script>
+</body>
+</html>
