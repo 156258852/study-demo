@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Flex 垂直布局 - 最后一个元素上方的分割线</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      padding: 40px;
+      background: #f5f5f5;
+    }
+
+    h2 {
+      margin-bottom: 12px;
+      color: #333;
+    }
+
+    .demo-section {
+      margin-bottom: 60px;
+    }
+
+    /* 方案一：伪元素 */
+    .container-1 {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      background: #fff;
+      padding: 16px;
+      border-radius: 8px;
+      width: 300px;
+    }
+
+    .container-1 .item {
+      padding: 12px 16px;
+      background: #e3f2fd;
+      border-radius: 4px;
+      color: #1976d2;
+    }
+
+    .container-1 .item:last-child {
+      position: relative;
+      margin-top: 12px; /* 与 gap 一致，留出分割线空间 */
+    }
+
+    .container-1 .item:last-child::before {
+      content: '';
+      position: absolute;
+      top: -12px; /* 在 item 上方，与 gap 一致 */
+      left: 0;
+      width: 100%;
+      height: 1px;
+      background: #ccc;
+    }
+
+    /* 方案二：直接加分割线元素 */
+    .container-2 {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      background: #fff;
+      padding: 16px;
+      border-radius: 8px;
+      width: 300px;
+    }
+
+    .container-2 .item {
+      padding: 12px 16px;
+      background: #e8f5e9;
+      border-radius: 4px;
+      color: #388e3c;
+    }
+
+    .container-2 .divider {
+      width: 100%;
+      height: 1px;
+      background: #ccc;
+    }
+  </style>
+</head>
+<body>
+  <div class="demo-section">
+    <h2>方案一：伪元素（推荐）</h2>
+    <p>最后一个 item 通过 ::before 显示分割线</p>
+    <div class="container-1">
+      <div class="item">Item 1</div>
+      <div class="item">Item 2</div>
+      <div class="item">Item 3（最后一个是这个）</div>
+    </div>
+  </div>
+
+  <div class="demo-section">
+    <h2>方案二：直接加分割线元素</h2>
+    <p>显式添加一个 divider 元素</p>
+    <div class="container-2">
+      <div class="item">Item 1</div>
+      <div class="item">Item 2</div>
+      <div class="divider"></div>
+      <div class="item">Item 3（最后一个是这个）</div>
+    </div>
+  </div>
+</body>
+</html>
