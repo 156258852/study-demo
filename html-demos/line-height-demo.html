@@ -1,0 +1,812 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>行高(line-height)与字体大小、高度关系演示</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+            font-size: 2rem;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+
+        .control-panel {
+            background: white;
+            border-radius: 16px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        }
+
+        .control-group {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+            margin-bottom: 20px;
+        }
+
+        .control-item {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .control-item label {
+            font-weight: 600;
+            color: #333;
+            font-size: 0.95rem;
+        }
+
+        .control-item .value-display {
+            font-size: 0.85rem;
+            color: #764ba2;
+            font-weight: 500;
+        }
+
+        input[type="range"] {
+            width: 100%;
+            height: 8px;
+            border-radius: 4px;
+            background: #e0e0e0;
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            cursor: pointer;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+        }
+
+        select {
+            padding: 10px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1rem;
+            cursor: pointer;
+            background: white;
+        }
+
+        select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .demo-section {
+            background: white;
+            border-radius: 16px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        }
+
+        .demo-section h2 {
+            color: #333;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        /* 可视化区域 */
+        .visualization-area {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-top: 20px;
+        }
+
+        @media (max-width: 900px) {
+            .visualization-area {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* 单行文本可视化 */
+        .single-line-demo {
+            background: #fafafa;
+            border-radius: 12px;
+            padding: 30px;
+            border: 2px dashed #e0e0e0;
+        }
+
+        .line-visual {
+            position: relative;
+            background: #e8f4fd;
+            margin: 20px 0;
+        }
+
+        .line-visual .half-leading-top {
+            background: rgba(255, 193, 7, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            color: #856404;
+            position: relative;
+        }
+
+        .line-visual .half-leading-bottom {
+            background: rgba(255, 193, 7, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            color: #856404;
+        }
+
+        .line-visual .text-content {
+            background: #667eea;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 500;
+        }
+
+        .line-visual .text-content::before {
+            content: '文字区域';
+            font-size: 12px;
+        }
+
+        /* 多行文本可视化 */
+        .multi-line-demo {
+            background: #fafafa;
+            border-radius: 12px;
+            padding: 30px;
+            border: 2px dashed #e0e0e0;
+        }
+
+        .multi-line-visual {
+            position: relative;
+        }
+
+        .multi-line-visual .line-row {
+            position: relative;
+            display: flex;
+        }
+
+        .multi-line-visual .line-row .half-leading {
+            background: rgba(255, 193, 7, 0.3);
+        }
+
+        .multi-line-visual .line-row .text-part {
+            background: #667eea;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .multi-line-visual .line-spacing-indicator {
+            position: absolute;
+            right: -60px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-size: 11px;
+            color: #666;
+        }
+
+        /* 图例 */
+        .legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-top: 20px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.85rem;
+        }
+
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            border-radius: 4px;
+        }
+
+        .legend-color.font-size {
+            background: #667eea;
+        }
+
+        .legend-color.line-height {
+            background: #e8f4fd;
+            border: 2px dashed #667eea;
+        }
+
+        .legend-color.leading {
+            background: rgba(255, 193, 7, 0.5);
+        }
+
+        /* 公式展示 */
+        .formula-section {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 12px;
+            margin: 20px 0;
+        }
+
+        .formula-section .formula {
+            font-size: 1.4rem;
+            font-family: 'Courier New', monospace;
+            text-align: center;
+            margin-bottom: 15px;
+            padding: 15px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 8px;
+        }
+
+        .formula-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .formula-item {
+            background: rgba(255,255,255,0.1);
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .formula-item .title {
+            font-size: 0.85rem;
+            opacity: 0.9;
+            margin-bottom: 5px;
+        }
+
+        .formula-item .expr {
+            font-family: 'Courier New', monospace;
+            font-size: 1.1rem;
+        }
+
+        /* 信息面板 */
+        .info-panel {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .info-card {
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4e8ec 100%);
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .info-card .label {
+            font-size: 0.85rem;
+            color: #666;
+            margin-bottom: 8px;
+        }
+
+        .info-card .value {
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: #333;
+        }
+
+        .info-card .unit {
+            font-size: 0.9rem;
+            color: #888;
+            margin-left: 3px;
+        }
+
+        /* 实时演示文本 */
+        .demo-text {
+            background: #fafafa;
+            border: 2px dashed #e0e0e0;
+            border-radius: 12px;
+            padding: 20px;
+            transition: all 0.3s ease;
+            margin-bottom: 20px;
+        }
+
+        /* 高度关系演示 */
+        .height-demo {
+            display: flex;
+            gap: 30px;
+            align-items: flex-start;
+            flex-wrap: wrap;
+        }
+
+        .height-demo-item {
+            flex: 1;
+            min-width: 250px;
+            background: #fafafa;
+            border-radius: 12px;
+            padding: 20px;
+            border: 2px dashed #e0e0e0;
+        }
+
+        .height-demo-item h4 {
+            color: #667eea;
+            margin-bottom: 15px;
+            font-size: 0.95rem;
+        }
+
+        .height-box {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 8px;
+            font-weight: 500;
+            margin: 10px 0;
+        }
+
+        /* 尺寸标注 */
+        .dimension-label {
+            font-size: 12px;
+            color: #666;
+            text-align: center;
+            margin: 5px 0;
+        }
+
+        .dimension-arrow {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #667eea;
+            font-size: 11px;
+        }
+
+        .dimension-arrow::before,
+        .dimension-arrow::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: #667eea;
+        }
+
+        .dimension-arrow::before {
+            margin-right: 8px;
+        }
+
+        .dimension-arrow::after {
+            margin-left: 8px;
+        }
+
+        /* 提示框 */
+        .tips {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px 20px;
+            border-radius: 0 8px 8px 0;
+            margin-top: 20px;
+        }
+
+        .tips h4 {
+            color: #856404;
+            margin-bottom: 8px;
+        }
+
+        .tips ul {
+            margin-left: 20px;
+            color: #856404;
+        }
+
+        .tips li {
+            margin-bottom: 5px;
+        }
+
+        /* 公式高亮 */
+        .highlight {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: 700;
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 1.5rem;
+            }
+            .control-panel, .demo-section {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📐 行高、字体大小、高度与行间距关系演示</h1>
+
+        <!-- 控制面板 -->
+        <div class="control-panel">
+            <div class="control-group">
+                <div class="control-item">
+                    <label>字体大小 (font-size): <span class="value-display" id="fontSizeValue">16px</span></label>
+                    <input type="range" id="fontSize" min="12" max="48" value="16" step="1">
+                </div>
+                <div class="control-item">
+                    <label>行高值: <span class="value-display" id="lineHeightValue">1.5</span></label>
+                    <input type="range" id="lineHeight" min="1" max="3" value="1.5" step="0.1">
+                </div>
+            </div>
+        </div>
+
+        <!-- 公式展示 -->
+        <div class="demo-section">
+            <h2>📐 核心公式</h2>
+            <div class="formula-section">
+                <div class="formula">行高 (line-height) = 字体大小 (font-size) × 行高倍数</div>
+                <div class="formula-grid">
+                    <div class="formula-item">
+                        <div class="title">行间距 (leading)</div>
+                        <div class="expr" id="formulaLeading">行高 - 字体大小</div>
+                    </div>
+                    <div class="formula-item">
+                        <div class="title">上半行距 (半行距)</div>
+                        <div class="expr">行间距 ÷ 2</div>
+                    </div>
+                    <div class="formula-item">
+                        <div class="title">下半行距 (半行距)</div>
+                        <div class="expr">行间距 ÷ 2</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 单行文本可视化 -->
+        <div class="demo-section">
+            <h2>🎯 单行文本结构可视化</h2>
+            <p style="color: #666; margin-bottom: 15px;">观察文字区域（紫色）与行高区域（蓝色边框）的关系，黄色区域为行间距</p>
+            
+            <div class="visualization-area">
+                <div class="single-line-demo">
+                    <h4 style="color: #667eea; margin-bottom: 15px;">结构分解图</h4>
+                    <div class="line-visual" id="singleLineVisual">
+                        <div class="dimension-arrow" id="dimensionTop">← 半行距 →</div>
+                        <div class="half-leading-top" id="halfLeadingTop">半行距</div>
+                        <div class="text-content" id="textContent">文字区域</div>
+                        <div class="half-leading-bottom" id="halfLeadingBottom">半行距</div>
+                        <div class="dimension-arrow" id="dimensionBottom">← 半行距 →</div>
+                    </div>
+                    <div class="dimension-label" id="totalHeightLabel">总高度 (行高) = 24px</div>
+                </div>
+
+                <div class="single-line-demo">
+                    <h4 style="color: #667eea; margin-bottom: 15px;">计算结果</h4>
+                    <div class="info-panel">
+                        <div class="info-card">
+                            <div class="label">字体大小</div>
+                            <div class="value"><span id="infoFontSize">16</span><span class="unit">px</span></div>
+                        </div>
+                        <div class="info-card">
+                            <div class="label">行高</div>
+                            <div class="value"><span id="infoLineHeight">24</span><span class="unit">px</span></div>
+                        </div>
+                        <div class="info-card">
+                            <div class="label">行间距</div>
+                            <div class="value"><span id="infoLeading">8</span><span class="unit">px</span></div>
+                        </div>
+                        <div class="info-card">
+                            <div class="label">半行距</div>
+                            <div class="value"><span id="infoHalfLeading">4</span><span class="unit">px</span></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="legend">
+                <div class="legend-item">
+                    <div class="legend-color font-size"></div>
+                    <span>字体大小区域 (文字实际占用)</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color line-height"></div>
+                    <span>行高区域 (整体高度)</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color leading"></div>
+                    <span>行间距 (上下半行距)</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 多行文本与行间距 -->
+        <div class="demo-section">
+            <h2>📏 多行文本与行间距</h2>
+            <p style="color: #666; margin-bottom: 15px;">观察两行文字之间的间距是如何由上下两行的半行距组成的</p>
+
+            <div class="visualization-area">
+                <div class="multi-line-demo">
+                    <div class="multi-line-visual" id="multiLineVisual">
+                        <!-- 动态生成 -->
+                    </div>
+                </div>
+
+                <div class="multi-line-demo">
+                    <h4 style="color: #667eea; margin-bottom: 15px;">行间距详解</h4>
+                    <div style="background: #e8f4fd; border-radius: 8px; padding: 20px;">
+                        <div style="text-align: center; margin-bottom: 15px;">
+                            <div style="font-size: 14px; color: #666;">第一行文字</div>
+                            <div style="font-size: 12px; color: #ffc107; font-weight: bold;">↓ 半行距</div>
+                            <div style="background: rgba(255, 193, 7, 0.3); padding: 10px; border-radius: 4px; margin: 5px 0;">
+                                <strong>行间距 = 半行距上 + 半行距下</strong>
+                            </div>
+                            <div style="font-size: 12px; color: #ffc107; font-weight: bold;">↓ 半行距</div>
+                            <div style="font-size: 14px; color: #666;">第二行文字</div>
+                        </div>
+                        <div style="text-align: center; font-size: 13px; color: #333; margin-top: 10px;">
+                            行间距 = <span class="highlight" id="multiLineSpacing">8px</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 行高与容器高度 -->
+        <div class="demo-section">
+            <h2>📦 行高与容器高度的关系</h2>
+            <p style="color: #666; margin-bottom: 15px;">当容器未设置高度时，容器高度由内容决定（内容高度 = 行高 × 行数）</p>
+
+            <div class="height-demo">
+                <div class="height-demo-item">
+                    <h4>单行文本容器</h4>
+                    <div class="height-box" id="singleLineContainer">
+                        单行文字
+                    </div>
+                    <div class="dimension-label" id="singleContainerHeight">容器高度 = 行高 = 24px</div>
+                </div>
+
+                <div class="height-demo-item">
+                    <h4>三行文本容器</h4>
+                    <div class="height-box" id="multiLineContainer" style="flex-direction: column;">
+                        <span>第一行文字</span>
+                        <span>第二行文字</span>
+                        <span>第三行文字</span>
+                    </div>
+                    <div class="dimension-label" id="multiContainerHeight">容器高度 = 行高 × 3 = 72px</div>
+                </div>
+
+                <div class="height-demo-item">
+                    <h4>单行垂直居中技巧</h4>
+                    <div class="height-box" id="centerDemo" style="background: linear-gradient(135deg, #28a745 0%, #20c997 100%);">
+                        垂直居中
+                    </div>
+                    <div class="dimension-label">height = line-height = 60px</div>
+                    <p style="font-size: 12px; color: #666; margin-top: 10px;">设置容器高度等于行高可实现单行文本垂直居中</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 实时演示 -->
+        <div class="demo-section">
+            <h2>✍️ 实时效果预览</h2>
+            <div class="demo-text" id="demoText">
+                <div>这是一段示例文本，用于展示行高和字体大小的关系。</div>
+                <div>行高决定了文本行与行之间的垂直间距。</div>
+                <div>合理的行高可以提高文本的可读性和美观度。</div>
+                <div>Line-height controls the vertical spacing between lines of text.</div>
+            </div>
+            <div style="display: flex; gap: 20px; flex-wrap: wrap;">
+                <div style="flex: 1; min-width: 200px; background: #f8f9fa; padding: 15px; border-radius: 8px;">
+                    <strong style="color: #667eea;">当前设置：</strong>
+                    <div id="currentSettings" style="margin-top: 8px; font-family: monospace;"></div>
+                </div>
+                <div style="flex: 1; min-width: 200px; background: #f8f9fa; padding: 15px; border-radius: 8px;">
+                    <strong style="color: #667eea;">CSS代码：</strong>
+                    <code id="cssCode" style="display: block; margin-top: 8px; font-family: monospace; white-space: pre; color: #333;"></code>
+                </div>
+            </div>
+        </div>
+
+        <!-- 提示 -->
+        <div class="demo-section">
+            <h2>💡 关键知识点</h2>
+            <div class="tips">
+                <h4>核心概念</h4>
+                <ul>
+                    <li><strong>行高 (line-height)</strong>：一行文字所占据的垂直高度</li>
+                    <li><strong>字体大小 (font-size)</strong>：文字本身的视觉高度</li>
+                    <li><strong>行间距 (leading)</strong>：行高 - 字体大小，即文字上下的空白空间</li>
+                    <li><strong>半行距</strong>：行间距的一半，均匀分布在文字上下</li>
+                </ul>
+            </div>
+            <div class="tips" style="background: #d4edda; border-left-color: #28a745; margin-top: 15px;">
+                <h4 style="color: #155724;">最佳实践</h4>
+                <ul style="color: #155724;">
+                    <li><strong>推荐使用无单位数字</strong>：如 line-height: 1.5，子元素继承比例值</li>
+                    <li><strong>正文文本</strong>：行高建议 1.5 - 1.8 之间</li>
+                    <li><strong>标题文本</strong>：行高建议 1.2 - 1.4 之间</li>
+                    <li><strong>单行垂直居中</strong>：设置 height = line-height</li>
+                    <li><strong>多行垂直居中</strong>：使用 flexbox 或 grid 布局</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const fontSizeSlider = document.getElementById('fontSize');
+        const lineHeightSlider = document.getElementById('lineHeight');
+        const demoText = document.getElementById('demoText');
+
+        function updateDemo() {
+            const fontSize = parseFloat(fontSizeSlider.value);
+            const lineHeightMultiplier = parseFloat(lineHeightSlider.value);
+            const lineHeightPx = fontSize * lineHeightMultiplier;
+            const leading = lineHeightPx - fontSize;
+            const halfLeading = leading / 2;
+
+            // 更新显示值
+            document.getElementById('fontSizeValue').textContent = fontSize + 'px';
+            document.getElementById('lineHeightValue').textContent = lineHeightMultiplier;
+
+            // 更新信息面板
+            document.getElementById('infoFontSize').textContent = fontSize;
+            document.getElementById('infoLineHeight').textContent = lineHeightPx.toFixed(1);
+            document.getElementById('infoLeading').textContent = leading.toFixed(1);
+            document.getElementById('infoHalfLeading').textContent = halfLeading.toFixed(1);
+
+            // 更新单行可视化
+            const textContent = document.getElementById('textContent');
+            const halfLeadingTop = document.getElementById('halfLeadingTop');
+            const halfLeadingBottom = document.getElementById('halfLeadingBottom');
+
+            textContent.style.height = fontSize + 'px';
+            textContent.style.fontSize = fontSize + 'px';
+            
+            if (halfLeading > 0) {
+                halfLeadingTop.style.height = halfLeading + 'px';
+                halfLeadingBottom.style.height = halfLeading + 'px';
+                halfLeadingTop.style.display = 'flex';
+                halfLeadingBottom.style.display = 'flex';
+                document.getElementById('dimensionTop').style.display = 'flex';
+                document.getElementById('dimensionBottom').style.display = 'flex';
+            } else {
+                halfLeadingTop.style.height = '0';
+                halfLeadingBottom.style.height = '0';
+                halfLeadingTop.style.display = 'none';
+                halfLeadingBottom.style.display = 'none';
+                document.getElementById('dimensionTop').style.display = 'none';
+                document.getElementById('dimensionBottom').style.display = 'none';
+            }
+
+            // 更新尺寸标注
+            document.getElementById('dimensionTop').textContent = `← 半行距 ${halfLeading.toFixed(1)}px →`;
+            document.getElementById('dimensionBottom').textContent = `← 半行距 ${halfLeading.toFixed(1)}px →`;
+            document.getElementById('totalHeightLabel').textContent = 
+                `总高度 (行高) = ${fontSize}px (字体) + ${leading.toFixed(1)}px (行间距) = ${lineHeightPx.toFixed(1)}px`;
+
+            // 更新多行可视化
+            updateMultiLineVisual(fontSize, lineHeightPx, halfLeading);
+
+            // 更新容器高度演示
+            document.getElementById('singleLineContainer').style.height = lineHeightPx + 'px';
+            document.getElementById('singleLineContainer').style.lineHeight = lineHeightPx + 'px';
+            document.getElementById('singleLineContainer').style.fontSize = fontSize + 'px';
+            document.getElementById('singleContainerHeight').textContent = 
+                `容器高度 = 行高 = ${lineHeightPx.toFixed(1)}px`;
+
+            document.getElementById('multiLineContainer').style.height = (lineHeightPx * 3) + 'px';
+            document.getElementById('multiLineContainer').style.lineHeight = lineHeightPx + 'px';
+            document.getElementById('multiLineContainer').style.fontSize = fontSize + 'px';
+            document.getElementById('multiContainerHeight').textContent = 
+                `容器高度 = 行高 × 3 = ${lineHeightPx.toFixed(1)} × 3 = ${(lineHeightPx * 3).toFixed(1)}px`;
+
+            // 更新实时预览
+            demoText.style.fontSize = fontSize + 'px';
+            demoText.style.lineHeight = lineHeightMultiplier;
+
+            document.getElementById('currentSettings').innerHTML = 
+                `font-size: ${fontSize}px;<br>line-height: ${lineHeightMultiplier};<br>行高: ${lineHeightPx.toFixed(1)}px; 行间距: ${leading.toFixed(1)}px`;
+            document.getElementById('cssCode').textContent = 
+                `font-size: ${fontSize}px;\nline-height: ${lineHeightMultiplier};`;
+
+            // 更新多行间距显示
+            document.getElementById('multiLineSpacing').textContent = leading.toFixed(1) + 'px';
+        }
+
+        function updateMultiLineVisual(fontSize, lineHeightPx, halfLeading) {
+            const container = document.getElementById('multiLineVisual');
+            container.innerHTML = '';
+
+            const lines = ['第一行文字', '第二行文字', '第三行文字'];
+            
+            lines.forEach((text, index) => {
+                const row = document.createElement('div');
+                row.className = 'line-row';
+                row.style.display = 'flex';
+                row.style.flexDirection = 'column';
+                row.style.alignItems = 'stretch';
+
+                // 上半行距
+                if (halfLeading > 0) {
+                    const topHalf = document.createElement('div');
+                    topHalf.className = 'half-leading';
+                    topHalf.style.height = halfLeading + 'px';
+                    topHalf.style.display = 'flex';
+                    topHalf.style.alignItems = 'center';
+                    topHalf.style.justifyContent = 'center';
+                    topHalf.style.fontSize = '11px';
+                    topHalf.style.color = '#856404';
+                    topHalf.textContent = '半行距';
+                    row.appendChild(topHalf);
+                }
+
+                // 文字区域
+                const textPart = document.createElement('div');
+                textPart.className = 'text-part';
+                textPart.style.height = fontSize + 'px';
+                textPart.style.fontSize = fontSize + 'px';
+                textPart.textContent = text;
+                row.appendChild(textPart);
+
+                // 下半行距
+                if (halfLeading > 0) {
+                    const bottomHalf = document.createElement('div');
+                    bottomHalf.className = 'half-leading';
+                    bottomHalf.style.height = halfLeading + 'px';
+                    bottomHalf.style.display = 'flex';
+                    bottomHalf.style.alignItems = 'center';
+                    bottomHalf.style.justifyContent = 'center';
+                    bottomHalf.style.fontSize = '11px';
+                    bottomHalf.style.color = '#856404';
+                    bottomHalf.textContent = '半行距';
+                    row.appendChild(bottomHalf);
+                }
+
+                // 添加行间距标注（除了最后一行）
+                if (index < lines.length - 1) {
+                    const spacingLabel = document.createElement('div');
+                    spacingLabel.style.cssText = `
+                        background: rgba(255, 193, 7, 0.3);
+                        color: #856404;
+                        font-size: 11px;
+                        padding: 5px;
+                        text-align: center;
+                    `;
+                    spacingLabel.textContent = `↑ 行间距 ${((lineHeightPx - fontSize)).toFixed(1)}px ↓`;
+                    row.appendChild(spacingLabel);
+                }
+
+                container.appendChild(row);
+            });
+        }
+
+        // 事件监听
+        fontSizeSlider.addEventListener('input', updateDemo);
+        lineHeightSlider.addEventListener('input', updateDemo);
+
+        // 初始化
+        updateDemo();
+    </script>
+</body>
+</html>

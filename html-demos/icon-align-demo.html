@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>图标与多行文本第一行对齐方案对比</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f5f5f5;
+            padding: 40px 20px;
+            min-height: 100vh;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 40px;
+        }
+
+        .demo-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .demo-card {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+
+        .demo-card h2 {
+            font-size: 1.1rem;
+            color: #333;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #eee;
+        }
+
+        .demo-card .tag {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            margin-left: 10px;
+        }
+
+        .tag.recommend {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .tag.warn {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        /* 示例容器 */
+        .example {
+            background: #fafafa;
+            border: 1px dashed #ddd;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+
+        /* 可视化标注 */
+        .visual-box {
+            position: relative;
+            background: rgba(102, 126, 234, 0.05);
+            border: 2px dashed #667eea;
+        }
+
+        .visual-box .label {
+            position: absolute;
+            right: 5px;
+            top: 5px;
+            font-size: 10px;
+            color: #667eea;
+            background: white;
+            padding: 2px 5px;
+            border-radius: 3px;
+        }
+
+        /* ===== 方案1：flex-start + wrapper ===== */
+        .method1 .item {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+        }
+
+        .method1 .icon-wrapper {
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 193, 7, 0.2);
+            border: 1px dashed #ffc107;
+        }
+
+        .method1 .icon-wrapper .icon {
+            font-size: 16px;
+        }
+
+        .method1 .text {
+            line-height: 24px;
+        }
+
+        /* ===== 方案2：inline-block + vertical-align ===== */
+        .method2 .item {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+        }
+
+        .method2 .icon-inline {
+            display: inline-block;
+            line-height: 24px;
+            vertical-align: middle;
+            background: rgba(255, 193, 7, 0.2);
+            border: 1px dashed #ffc107;
+            font-size: 16px;
+        }
+
+        .method2 .text {
+            line-height: 24px;
+        }
+
+        /* ===== 方案3：line-height直接对齐（有问题） ===== */
+        .method3 .item {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+        }
+
+        .method3 .icon-bad {
+            line-height: 24px;
+            background: rgba(220, 53, 69, 0.1);
+            border: 1px dashed #dc3545;
+            font-size: 16px;
+        }
+
+        .method3 .text {
+            line-height: 24px;
+        }
+
+        /* ===== 方案4：使用图标自身的line-height ===== */
+        .method4 .item {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+        }
+
+        .method4 .icon-self {
+            display: flex;
+            align-items: center;
+            height: 24px;
+            font-size: 16px;
+        }
+
+        .method4 .text {
+            line-height: 24px;
+        }
+
+        /* ===== 方案5：align-items center（对比：整体居中） ===== */
+        .method5 .item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .method5 .icon-wrapper {
+            height: 72px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(220, 53, 69, 0.1);
+            border: 1px dashed #dc3545;
+        }
+
+        .method5 .text {
+            line-height: 24px;
+        }
+
+        /* 代码展示 */
+        .code-box {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            overflow-x: auto;
+            margin-top: 15px;
+        }
+
+        .code-box .keyword {
+            color: #63b3ed;
+        }
+
+        .code-box .value {
+            color: #68d391;
+        }
+
+        .code-box .comment {
+            color: #718096;
+        }
+
+        /* 控制面板 */
+        .control-panel {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            max-width: 1200px;
+            margin: 0 auto 30px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+
+        .control-panel h2 {
+            margin-bottom: 20px;
+        }
+
+        .control-row {
+            display: flex;
+            gap: 30px;
+            flex-wrap: wrap;
+        }
+
+        .control-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .control-item label {
+            font-weight: 500;
+            color: #333;
+        }
+
+        input[type="range"] {
+            width: 150px;
+            height: 6px;
+            border-radius: 3px;
+            background: #ddd;
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: #667eea;
+            cursor: pointer;
+        }
+
+        .value-display {
+            font-size: 14px;
+            color: #667eea;
+            font-weight: 600;
+        }
+
+        /* 说明框 */
+        .explain {
+            background: #e8f4fd;
+            border-left: 3px solid #667eea;
+            padding: 12px 15px;
+            margin-top: 15px;
+            border-radius: 0 6px 6px 0;
+            font-size: 14px;
+            color: #333;
+        }
+
+        .explain.warn {
+            background: #fce4ec;
+            border-left-color: #dc3545;
+        }
+
+        .explain.success {
+            background: #d4edda;
+            border-left-color: #28a745;
+        }
+
+        /* 对比图 */
+        .comparison-visual {
+            display: flex;
+            gap: 20px;
+            margin: 20px 0;
+            justify-content: center;
+        }
+
+        .align-demo {
+            background: #fafafa;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+        }
+
+        .align-demo h4 {
+            margin-bottom: 10px;
+            font-size: 13px;
+        }
+
+        .align-demo .box {
+            display: flex;
+            border: 2px dashed;
+            padding: 5px;
+            gap: 8px;
+        }
+
+        .align-demo.correct .box {
+            border-color: #28a745;
+        }
+
+        .align-demo.wrong .box {
+            border-color: #dc3545;
+        }
+
+        .align-demo .icon-area {
+            width: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+        }
+
+        .align-demo .text-area {
+            font-size: 12px;
+            line-height: 20px;
+        }
+
+        .align-demo.correct .icon-area {
+            background: rgba(40, 167, 69, 0.2);
+        }
+
+        .align-demo.wrong .icon-area {
+            background: rgba(220, 53, 69, 0.2);
+        }
+
+        .check-icon {
+            color: #28a745;
+            margin-right: 5px;
+        }
+
+        .x-icon {
+            color: #dc3545;
+            margin-right: 5px;
+        }
+    </style>
+</head>
+<body>
+    <h1>📍 图标与多行文本第一行对齐方案对比</h1>
+
+    <!-- 控制面板 -->
+    <div class="control-panel">
+        <h2>调整参数观察效果</h2>
+        <div class="control-row">
+            <div class="control-item">
+                <label>字体大小：</label>
+                <input type="range" id="fontSize" min="12" max="24" value="16">
+                <span class="value-display" id="fontSizeValue">16px</span>
+            </div>
+            <div class="control-item">
+                <label>行高倍数：</label>
+                <input type="range" id="lineHeight" min="1.2" max="2" value="1.5" step="0.1">
+                <span class="value-display" id="lineHeightValue">1.5</span>
+            </div>
+            <div class="control-item">
+                <label>图标大小：</label>
+                <input type="range" id="iconSize" min="12" max="32" value="16">
+                <span class="value-display" id="iconSizeValue">16px</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- 效果对比 -->
+    <div class="control-panel" style="margin-bottom: 30px;">
+        <h2>对齐效果对比图</h2>
+        <div class="comparison-visual">
+            <div class="align-demo correct">
+                <h4><span class="check-icon">✓</span>正确：第一行对齐</h4>
+                <div class="box" style="align-items: flex-start;">
+                    <div class="icon-area" style="height: 24px; align-items: center;">📌</div>
+                    <div class="text-area">第一行文字<br>第二行文字<br>第三行文字</div>
+                </div>
+                <p style="font-size: 12px; color: #28a745; margin-top: 10px;">图标与第一行顶部对齐</p>
+            </div>
+            <div class="align-demo wrong">
+                <h4><span class="x-icon">✗</span>错误：整体居中</h4>
+                <div class="box" style="align-items: center;">
+                    <div class="icon-area" style="height: 60px; align-items: center;">📌</div>
+                    <div class="text-area">第一行文字<br>第二行文字<br>第三行文字</div>
+                </div>
+                <p style="font-size: 12px; color: #dc3545; margin-top: 10px;">图标在整个文本块中间</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 方案展示 -->
+    <div class="demo-grid">
+        <!-- 方案1 -->
+        <div class="demo-card method1">
+            <h2>方案1：flex-start + icon wrapper <span class="tag recommend">推荐</span></h2>
+            
+            <div class="example" id="example1">
+                <div class="item">
+                    <div class="icon-wrapper visual-box">
+                        <span class="label">height=line-height</span>
+                        <div class="icon">📌</div>
+                    </div>
+                    <div class="text">
+                        <div>第一行文字内容</div>
+                        <div>第二行文字内容</div>
+                        <div>第三行文字内容</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="explain success">
+                ✓ 外层 flex-start 让容器顶部对齐<br>
+                ✓ icon-wrapper 高度 = 行高，内部 flex 居中让图标在行高框内居中<br>
+                ✓ 图标和第一行文字完美对齐
+            </div>
+
+            <div class="code-box">
+<span class="comment">/* CSS */</span>
+.item {
+    <span class="keyword">display</span>: flex;
+    <span class="keyword">align-items</span>: <span class="value">flex-start</span>; <span class="comment">/* 顶部对齐 */</span>
+}
+.icon-wrapper {
+    <span class="keyword">height</span>: <span class="value">24px</span>; <span class="comment">/* = 行高 */</span>
+    <span class="keyword">display</span>: flex;
+    <span class="keyword">align-items</span>: <span class="value">center</span>;
+}
+.text {
+    <span class="keyword">line-height</span>: <span class="value">24px</span>;
+}
+            </div>
+        </div>
+
+        <!-- 方案2 -->
+        <div class="demo-card method2">
+            <h2>方案2：inline-block + vertical-align <span class="tag recommend">推荐</span></h2>
+            
+            <div class="example" id="example2">
+                <div class="item">
+                    <span class="icon-inline visual-box">📌</span>
+                    <div class="text">
+                        <div>第一行文字内容</div>
+                        <div>第二行文字内容</div>
+                        <div>第三行文字内容</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="explain success">
+                ✓ 图标本身设置 line-height = 文本行高<br>
+                ✓ vertical-align: middle 让图标在行高框内居中<br>
+                ✓ 代码更简洁，不需要额外 wrapper
+            </div>
+
+            <div class="code-box">
+<span class="comment">/* CSS */</span>
+.item {
+    <span class="keyword">display</span>: flex;
+    <span class="keyword">align-items</span>: <span class="value">flex-start</span>;
+}
+.icon-inline {
+    <span class="keyword">display</span>: <span class="value">inline-block</span>;
+    <span class="keyword">line-height</span>: <span class="value">24px</span>;
+    <span class="keyword">vertical-align</span>: <span class="value">middle</span>;
+}
+.text {
+    <span class="keyword">line-height</span>: <span class="value">24px</span>;
+}
+            </div>
+        </div>
+
+        <!-- 方案3 -->
+        <div class="demo-card method3">
+            <h2>方案3：只设置line-height（不推荐）<span class="tag warn">有问题</span></h2>
+            
+            <div class="example" id="example3">
+                <div class="item">
+                    <span class="icon-bad visual-box">📌</span>
+                    <div class="text">
+                        <div>第一行文字内容</div>
+                        <div>第二行文字内容</div>
+                        <div>第三行文字内容</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="explain warn">
+                ✗ 仅设置 line-height，图标会在顶部边缘<br>
+                ✗ 小图标可能看起来"飘"在文字上方<br>
+                ✗ 缺少垂直居中效果
+            </div>
+
+            <div class="code-box">
+<span class="comment">/* CSS - 有问题 */</span>
+.icon-bad {
+    <span class="keyword">line-height</span>: <span class="value">24px</span>;
+    <span class="comment">/* 缺少 vertical-align 或 flex居中 */</span>
+}
+            </div>
+        </div>
+
+        <!-- 方案4 -->
+        <div class="demo-card method4">
+            <h2>方案4：flex + align-items center <span class="tag recommend">推荐</span></h2>
+            
+            <div class="example" id="example4">
+                <div class="item">
+                    <div class="icon-self visual-box" style="background: rgba(255, 193, 7, 0.2); border: 1px dashed #ffc107;">
+                        <span class="label">height=line-height</span>
+                        <span class="icon">📌</span>
+                    </div>
+                    <div class="text">
+                        <div>第一行文字内容</div>
+                        <div>第二行文字内容</div>
+                        <div>第三行文字内容</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="explain success">
+                ✓ 与方案1类似，更简洁的写法<br>
+                ✓ icon 容器用 flex + height 控制垂直位置<br>
+                ✓ 效果稳定可靠
+            </div>
+
+            <div class="code-box">
+<span class="comment">/* CSS */</span>
+.icon-self {
+    <span class="keyword">display</span>: flex;
+    <span class="keyword">align-items</span>: <span class="value">center</span>;
+    <span class="keyword">height</span>: <span class="value">24px</span>; <span class="comment">/* = 行高 */</span>
+}
+            </div>
+        </div>
+
+        <!-- 方案5：对比错误做法 -->
+        <div class="demo-card method5">
+            <h2>方案5：align-items center（错误示范）<span class="tag warn">整体居中</span></h2>
+            
+            <div class="example" id="example5">
+                <div class="item">
+                    <div class="icon-wrapper visual-box">
+                        <span class="label">height=总高度</span>
+                        <div class="icon">📌</div>
+                    </div>
+                    <div class="text">
+                        <div>第一行文字内容</div>
+                        <div>第二行文字内容</div>
+                        <div>第三行文字内容</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="explain warn">
+                ✗ align-items: center 让图标在整个文本块垂直居中<br>
+                ✗ 图标和第二行对齐，不是第一行<br>
+                ✗ 这通常是"错误"的需求实现
+            </div>
+
+            <div class="code-box">
+<span class="comment">/* CSS - 错误做法 */</span>
+.item {
+    <span class="keyword">display</span>: flex;
+    <span class="keyword">align-items</span>: <span class="value">center</span>; <span class="comment">/* 整体居中 */</span>
+}
+            </div>
+        </div>
+    </div>
+
+    <!-- 总结 -->
+    <div class="control-panel" style="margin-top: 30px;">
+        <h2>📝 总结：核心要点</h2>
+        <div style="background: #f8f9fa; padding: 20px; border-radius: 8px;">
+            <h3 style="color: #667eea; margin-bottom: 15px;">图标与第一行对齐的通用公式：</h3>
+            <div style="background: linear-gradient(135deg, #667eea, #764ba2); color: white; padding: 20px; border-radius: 8px; font-family: monospace; margin-bottom: 20px;">
+                <div style="font-size: 18px; text-align: center;">
+                    外层容器: align-items: flex-start（顶部对齐）
+                </div>
+                <div style="font-size: 18px; text-align: center; margin-top: 10px;">
+                    图标容器: height = 行高 + 内部 flex 居中
+                </div>
+            </div>
+            <ul style="line-height: 1.8; color: #333;">
+                <li><strong>关键1</strong>：外层用 flex-start 让图标容器和文本容器顶部对齐</li>
+                <li><strong>关键2</strong>：图标容器高度 = 文本行高（等于第一行的"框"高度）</li>
+                <li><strong>关键3</strong>：图标容器内部用 flex center 让图标在"行高框"内居中</li>
+                <li><strong>简化版</strong>：图标直接设置 line-height + vertical-align: middle（方案2）</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        const fontSizeSlider = document.getElementById('fontSize');
+        const lineHeightSlider = document.getElementById('lineHeight');
+        const iconSizeSlider = document.getElementById('iconSize');
+
+        function updateAll() {
+            const fontSize = parseFloat(fontSizeSlider.value);
+            const lineHeightMultiplier = parseFloat(lineHeightSlider.value);
+            const iconSize = parseFloat(iconSizeSlider.value);
+            const lineHeightPx = fontSize * lineHeightMultiplier;
+
+            // 更新显示值
+            document.getElementById('fontSizeValue').textContent = fontSize + 'px';
+            document.getElementById('lineHeightValue').textContent = lineHeightMultiplier;
+            document.getElementById('iconSizeValue').textContent = iconSize + 'px';
+
+            // 方案1
+            const method1Wrapper = document.querySelector('.method1 .icon-wrapper');
+            const method1Text = document.querySelector('.method1 .text');
+            method1Wrapper.style.height = lineHeightPx + 'px';
+            method1Text.style.lineHeight = lineHeightPx + 'px';
+            method1Text.style.fontSize = fontSize + 'px';
+            method1Wrapper.querySelector('.icon').style.fontSize = iconSize + 'px';
+
+            // 方案2
+            const method2Icon = document.querySelector('.method2 .icon-inline');
+            const method2Text = document.querySelector('.method2 .text');
+            method2Icon.style.lineHeight = lineHeightPx + 'px';
+            method2Icon.style.fontSize = iconSize + 'px';
+            method2Text.style.lineHeight = lineHeightPx + 'px';
+            method2Text.style.fontSize = fontSize + 'px';
+
+            // 方案3
+            const method3Icon = document.querySelector('.method3 .icon-bad');
+            const method3Text = document.querySelector('.method3 .text');
+            method3Icon.style.lineHeight = lineHeightPx + 'px';
+            method3Icon.style.fontSize = iconSize + 'px';
+            method3Text.style.lineHeight = lineHeightPx + 'px';
+            method3Text.style.fontSize = fontSize + 'px';
+
+            // 方案4
+            const method4Icon = document.querySelector('.method4 .icon-self');
+            const method4Text = document.querySelector('.method4 .text');
+            method4Icon.style.height = lineHeightPx + 'px';
+            method4Icon.style.fontSize = iconSize + 'px';
+            method4Text.style.lineHeight = lineHeightPx + 'px';
+            method4Text.style.fontSize = fontSize + 'px';
+
+            // 方案5
+            const method5Wrapper = document.querySelector('.method5 .icon-wrapper');
+            const method5Text = document.querySelector('.method5 .text');
+            method5Wrapper.style.height = (lineHeightPx * 3) + 'px';
+            method5Text.style.lineHeight = lineHeightPx + 'px';
+            method5Text.style.fontSize = fontSize + 'px';
+            method5Wrapper.querySelector('.icon').style.fontSize = iconSize + 'px';
+        }
+
+        fontSizeSlider.addEventListener('input', updateAll);
+        lineHeightSlider.addEventListener('input', updateAll);
+        iconSizeSlider.addEventListener('input', updateAll);
+
+        updateAll();
+    </script>
+</body>
+</html>
